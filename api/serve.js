@@ -7,7 +7,8 @@ const path = require('path');
 
 module.exports = (req, res) => {
   const url = (process.env.APPS_SCRIPT_WEB_APP_URL || '').trim() || 'YOUR_APPS_SCRIPT_WEB_APP_URL';
-  const filePath = path.join(process.cwd(), 'duty.html');
+  // โฟลเดอร์ api/ อยู่ระดับเดียวกับ duty.html → อ่านจาก parent ของ __dirname
+  const filePath = path.join(__dirname, '..', 'duty.html');
 
   try {
     let html = fs.readFileSync(filePath, 'utf8');
@@ -15,8 +16,10 @@ module.exports = (req, res) => {
     html = html.replace(placeholder, 'const APPS_SCRIPT_URL = ' + JSON.stringify(url) + ';');
 
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
     res.status(200).end(html);
   } catch (err) {
-    res.status(500).send('ไม่พบไฟล์ duty.html');
+    console.error('serve error:', err.message);
+    res.status(500).setHeader('Content-Type', 'text/plain; charset=utf-8').end('ไม่พบไฟล์ duty.html: ' + err.message);
   }
 };
