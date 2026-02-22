@@ -1,9 +1,4 @@
 {
-  "builds": [
-    { "src": "api/serve.js", "use": "@vercel/node" }
-  ],
-  "routes": [
-    { "src": "/", "dest": "/api/serve" },
-    { "src": "/(.*)", "dest": "/api/serve" }
-  ]
+  "buildCommand": "node scripts/inject-env.js",
+  "outputDirectory": "out"
 }

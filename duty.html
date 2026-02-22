@@ -28,11 +28,16 @@
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
+  html, body {
+    height: 100%;
+  }
+
   body {
     font-family: var(--font-main);
     background: var(--bg-primary);
     color: var(--text-primary);
     min-height: 100vh;
+    height: 100vh;
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -84,10 +89,12 @@
     50% { opacity: 0.5; }
   }
 
-  /* Chat Area */
+  /* Chat Area — min-height: 0 ให้ flex อนุญาตให้เลื่อนได้ */
   .chat-area {
     flex: 1;
+    min-height: 0;
     overflow-y: auto;
+    overflow-x: hidden;
     padding: 24px;
     display: flex;
     flex-direction: column;

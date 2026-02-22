@@ -4,7 +4,8 @@
   "description": "ระบบถามเวร — Duty Roster Chat",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "build": "node scripts/inject-env.js"
   },
   "dependencies": {
     "dotenv": "^16.4.5"
