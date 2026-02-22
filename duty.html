@@ -119,9 +119,9 @@
     animation: fadeIn 0.3s ease;
   }
 
-  /* ข้อความบอต (ตารางเวร) ให้กว้างขึ้น เพื่อเห็นชื่อ Consult ครบ */
+  /* ข้อความบอต (ตารางเวร) ใช้ความกว้างเต็มที่ */
   .message.bot {
-    max-width: 96%;
+    max-width: 100%;
     align-self: flex-start;
   }
 
@@ -170,29 +170,34 @@
 
   .message-content .duty-card {
     margin-top: 10px;
-    padding: 12px;
+    padding: 12px 16px;
     background: rgba(56, 189, 248, 0.06);
     border: 1px solid rgba(56, 189, 248, 0.12);
     border-radius: 10px;
     font-family: var(--font-mono);
     font-size: 13px;
+    min-width: 0;
   }
 
   .duty-row {
     display: flex;
-    justify-content: space-between;
     align-items: flex-start;
-    gap: 12px;
+    gap: 16px;
     padding: 6px 0;
     border-bottom: 1px solid rgba(255,255,255,0.04);
   }
 
   .duty-row:last-child { border-bottom: none; }
-  .duty-label { color: var(--text-secondary); flex-shrink: 0; }
+  .duty-label {
+    color: var(--text-secondary);
+    flex-shrink: 0;
+    min-width: 100px;
+  }
   .duty-name {
+    flex: 1;
+    min-width: 0;
     color: var(--accent);
     font-weight: 500;
-    min-width: 0;
     word-break: break-word;
     text-align: right;
   }
@@ -330,7 +335,7 @@
 
   @media (max-width: 600px) {
     .message { max-width: 92%; }
-    .message.bot { max-width: 98%; }
+    .message.bot { max-width: 100%; }
     .header { padding: 12px 16px; }
     .chat-area { padding: 16px; }
     .input-area { padding: 12px 16px 16px; }
