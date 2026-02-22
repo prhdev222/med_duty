@@ -7,8 +7,13 @@ const path = require('path');
 
 module.exports = (req, res) => {
   const url = (process.env.APPS_SCRIPT_WEB_APP_URL || '').trim() || 'YOUR_APPS_SCRIPT_WEB_APP_URL';
-  // โฟลเดอร์ api/ อยู่ระดับเดียวกับ duty.html → อ่านจาก parent ของ __dirname
-  const filePath = path.join(__dirname, '..', 'duty.html');
+  // ลองหลาย path (Vercel กับ local อาจต่างกัน)
+  const candidates = [
+    path.join(__dirname, '..', 'duty.html'),
+    path.join(process.cwd(), 'duty.html'),
+    path.join(__dirname, 'duty.html')
+  ];
+  let filePath = candidates.find(p => { try { fs.accessSync(p); return true; } catch { return false; } }) || candidates[0];
 
   try {
     let html = fs.readFileSync(filePath, 'utf8');
