@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>🩺 ระบบถามเวร — Duty Roster Chat</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -37,13 +37,16 @@
     width: 100%;
     min-width: 100%;
     min-height: 100vh;
+    min-height: 100dvh;
     height: 100vh;
+    height: 100dvh;
     font-family: var(--font-main);
     background: var(--bg-primary);
     color: var(--text-primary);
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    padding-bottom: env(safe-area-inset-bottom, 0);
   }
 
   /* Header */
@@ -252,10 +255,11 @@
     color: var(--accent);
   }
 
-  /* Input Area */
+  /* Input Area — ด้านล่างเว้น safe area ให้มือถือ (ไม่บังแชท) */
   .input-area {
     width: 100%;
     padding: 16px 24px 20px;
+    padding-bottom: max(20px, env(safe-area-inset-bottom, 0px));
     background: var(--bg-secondary);
     border-top: 1px solid var(--border);
     flex-shrink: 0;
@@ -345,8 +349,14 @@
     .message { max-width: 92%; }
     .message.bot { max-width: 100%; }
     .header { padding: 12px 16px; }
-    .chat-area { padding: 16px; }
-    .input-area { padding: 12px 16px 16px; }
+    .chat-area {
+      padding: 16px;
+      padding-bottom: max(16px, env(safe-area-inset-bottom, 0px));
+    }
+    .input-area {
+      padding: 12px 16px;
+      padding-bottom: max(16px, env(safe-area-inset-bottom, 0px));
+    }
     .quick-actions { padding: 8px 16px; }
   }
 </style>
