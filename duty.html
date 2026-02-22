@@ -227,7 +227,33 @@
     30% { transform: translateY(-6px); }
   }
 
-  /* Quick Actions */
+  /* Quick Actions — ซ่อน/แสดงได้ */
+  .quick-actions-wrap {
+    width: 100%;
+    flex-shrink: 0;
+    border-top: 1px solid var(--border);
+  }
+
+  .quick-actions-toggle {
+    width: 100%;
+    padding: 6px 24px;
+    background: var(--bg-secondary);
+    border: none;
+    color: var(--text-muted);
+    font-size: 12px;
+    font-family: var(--font-main);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: color 0.2s;
+  }
+
+  .quick-actions-toggle:hover {
+    color: var(--accent);
+  }
+
   .quick-actions {
     width: 100%;
     padding: 8px 24px;
@@ -235,6 +261,12 @@
     gap: 8px;
     flex-wrap: wrap;
     flex-shrink: 0;
+    transition: opacity 0.2s, max-height 0.25s ease-out;
+    overflow: hidden;
+  }
+
+  .quick-actions.quick-actions--hidden {
+    display: none;
   }
 
   .quick-btn {
@@ -380,13 +412,19 @@
   </div>
 </div>
 
-<div class="quick-actions">
-  <button class="quick-btn" onclick="askQuestion('ใครเวรวันนี้')">📅 ใครเวรวันนี้?</button>
-  <button class="quick-btn" onclick="askQuestion('ใครเวรพรุ่งนี้')">🔜 ใครเวรพรุ่งนี้?</button>
-  <button class="quick-btn" onclick="askQuestion('ตารางเวรสัปดาห์นี้')">🗓️ เวรสัปดาห์นี้</button>
-  <button class="quick-btn" onclick="askQuestion('มีแลกเวรอะไรบ้าง')">🔄 มีแลกเวรอะไรบ้าง</button>
-  <button class="quick-btn" onclick="askQuestion('เวรของหมอสุพจน์วันไหน')">👤 เวรของหมอสุพจน์</button>
-  <button class="quick-btn" onclick="promptPersonDuty()">👤 เวรของใครคนหนึ่ง</button>
+<div class="quick-actions-wrap">
+  <button type="button" class="quick-actions-toggle" id="quickActionsToggle" onclick="toggleQuickActions()" aria-expanded="true">
+    <span id="quickActionsLabel">ซ่อนปุ่มคำถามสำเร็จรูป</span>
+    <span id="quickActionsIcon">▼</span>
+  </button>
+  <div class="quick-actions" id="quickActions">
+    <button class="quick-btn" onclick="askQuestion('ใครเวรวันนี้')">📅 ใครเวรวันนี้?</button>
+    <button class="quick-btn" onclick="askQuestion('ใครเวรพรุ่งนี้')">🔜 ใครเวรพรุ่งนี้?</button>
+    <button class="quick-btn" onclick="askQuestion('ตารางเวรสัปดาห์นี้')">🗓️ เวรสัปดาห์นี้</button>
+    <button class="quick-btn" onclick="askQuestion('มีแลกเวรอะไรบ้าง')">🔄 มีแลกเวรอะไรบ้าง</button>
+    <button class="quick-btn" onclick="askQuestion('เวรของหมอสุพจน์วันไหน')">👤 เวรของหมอสุพจน์</button>
+    <button class="quick-btn" onclick="promptPersonDuty()">👤 เวรของใครคนหนึ่ง</button>
+  </div>
 </div>
 
 <div class="input-area">
@@ -409,6 +447,17 @@ const APPS_SCRIPT_URL = '__APPS_SCRIPT_URL__';
 const chatArea = document.getElementById('chatArea');
 const userInput = document.getElementById('userInput');
 const sendBtn = document.getElementById('sendBtn');
+
+function toggleQuickActions() {
+  const el = document.getElementById('quickActions');
+  const label = document.getElementById('quickActionsLabel');
+  const icon = document.getElementById('quickActionsIcon');
+  const toggle = document.getElementById('quickActionsToggle');
+  const hidden = el.classList.toggle('quick-actions--hidden');
+  label.textContent = hidden ? 'แสดงปุ่มคำถามสำเร็จรูป' : 'ซ่อนปุ่มคำถามสำเร็จรูป';
+  icon.textContent = hidden ? '▶' : '▼';
+  toggle.setAttribute('aria-expanded', !hidden);
+}
 
 function addMessage(text, sender, isHTML = false) {
   // Remove welcome message
