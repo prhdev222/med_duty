@@ -2,629 +2,636 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>🩺 ระบบถามเวรอายุรกรรม — Duty Roster Chat</title>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🩺 ระบบถามเวร</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg-primary: #0a0f1a;
-    --bg-secondary: #111827;
-    --bg-card: #1a2236;
-    --bg-input: #0d1424;
-    --accent: #38bdf8;
-    --accent-glow: rgba(56, 189, 248, 0.15);
-    --accent-dim: #1e6a8e;
-    --text-primary: #e8edf5;
-    --text-secondary: #8494ad;
-    --text-muted: #4a5568;
-    --border: #1e2d45;
-    --success: #34d399;
-    --warning: #fbbf24;
-    --user-bubble: #1e3a5f;
-    --bot-bubble: #1a2236;
-    --font-main: 'IBM Plex Sans Thai', sans-serif;
-    --font-mono: 'JetBrains Mono', monospace;
+    --bg:#0b1120;--bg2:#111a2e;--bg3:#162038;--bgi:#0d1528;
+    --accent:#60a5fa;--accent2:#a78bfa;--glow:rgba(96,165,250,0.12);
+    --green:#34d399;--yellow:#fbbf24;--red:#f87171;
+    --text:#e4eaf4;--text2:#8899b0;--text3:#4a5a70;--border:#1e2e48;
+    --font:'Noto Sans Thai',sans-serif;--mono:'JetBrains Mono',monospace;
   }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;overflow-y:auto}
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  html {
-    width: 100%;
-    height: 100%;
+  /* LOGIN MODAL (popup เฉพาะตอนแลกเวร) */
+  .modal-overlay{
+    position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100;
+    display:flex;align-items:center;justify-content:center;
+    opacity:0;visibility:hidden;transition:all 0.3s;
   }
-
-  body {
-    width: 100%;
-    min-width: 100%;
-    min-height: 100vh;
-    min-height: 100dvh;
-    height: 100vh;
-    height: 100dvh;
-    font-family: var(--font-main);
-    background: var(--bg-primary);
-    color: var(--text-primary);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    padding-bottom: env(safe-area-inset-bottom, 0);
+  .modal-overlay.show{opacity:1;visibility:visible}
+  .modal-box{
+    width:340px;padding:32px 28px;background:var(--bg2);
+    border:1px solid var(--border);border-radius:18px;
+    box-shadow:0 0 60px rgba(96,165,250,0.1);text-align:center;
+    transform:translateY(20px);transition:transform 0.3s;
   }
-
-  /* Header */
-  .header {
-    width: 100%;
-    padding: 16px 24px;
-    background: var(--bg-secondary);
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    flex-shrink: 0;
+  .modal-overlay.show .modal-box{transform:translateY(0)}
+  .modal-box h3{font-size:18px;margin-bottom:4px}
+  .modal-box p{font-size:12px;color:var(--text2);margin-bottom:20px}
+  .modal-close{
+    position:absolute;top:12px;right:16px;background:none;border:none;
+    color:var(--text3);font-size:20px;cursor:pointer;
   }
-
-  .header-icon {
-    width: 44px; height: 44px;
-    background: linear-gradient(135deg, var(--accent), #818cf8);
-    border-radius: 12px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 22px;
-    box-shadow: 0 0 20px var(--accent-glow);
+  .m-field{
+    width:100%;padding:11px 15px;margin-bottom:10px;
+    background:var(--bgi);border:1px solid var(--border);border-radius:10px;
+    color:var(--text);font-family:var(--font);font-size:13.5px;outline:none;
   }
-
-  .header-text h1 {
-    font-size: 18px;
-    font-weight: 600;
-    letter-spacing: -0.3px;
+  .m-field:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--glow)}
+  .m-field::placeholder{color:var(--text3)}
+  .m-btn{
+    width:100%;padding:12px;margin-top:6px;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    border:none;border-radius:10px;color:#fff;font-size:14px;font-weight:600;
+    font-family:var(--font);cursor:pointer;transition:transform 0.15s;
   }
-
-  .header-text p {
-    font-size: 12px;
-    color: var(--text-secondary);
-    margin-top: 1px;
+  .m-btn:hover{transform:scale(1.02)}
+  .m-btn-secondary{
+    width:100%;padding:9px 12px;margin-bottom:8px;
+    background:rgba(148,163,184,0.12);
+    border:1px solid rgba(148,163,184,0.4);
+    border-radius:10px;color:var(--text2);font-size:12.5px;
+    font-family:var(--font);cursor:pointer;text-align:left;display:flex;align-items:center;gap:8px;
   }
+  .m-btn-secondary span.icon{font-size:16px}
+  .m-btn-secondary:hover{border-color:var(--accent);color:var(--accent)}
+  .m-error{color:var(--red);font-size:11px;margin-top:8px;min-height:16px}
 
-  .status-dot {
-    width: 8px; height: 8px;
-    background: var(--success);
-    border-radius: 50%;
-    margin-left: auto;
-    box-shadow: 0 0 8px rgba(52, 211, 153, 0.5);
-    animation: pulse 2s infinite;
+  /* HEADER */
+  .header{
+    padding:14px 20px;background:var(--bg2);border-bottom:1px solid var(--border);
+    display:flex;align-items:center;gap:12px;flex-shrink:0;
   }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
+  .header-icon{
+    width:40px;height:40px;background:linear-gradient(135deg,var(--accent),var(--accent2));
+    border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px;
   }
-
-  /* Chat Area — min-height: 0 ให้ flex อนุญาตให้เลื่อนได้ */
-  .chat-area {
-    width: 100%;
-    flex: 1;
-    min-height: 0;
-    overflow-y: auto;
-    overflow-x: hidden;
-    padding: 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    scrollbar-width: thin;
-    scrollbar-color: var(--border) transparent;
+  .header-text h1{font-size:16px;font-weight:600}
+  .header-text p{font-size:11px;color:var(--text2)}
+  .header-user{
+    margin-left:auto;display:none;align-items:center;gap:8px;
+    padding:5px 12px;background:var(--bg3);border-radius:18px;font-size:12px;color:var(--text2);
   }
+  .header-user.show{display:flex}
+  .header-user .dot{width:6px;height:6px;background:var(--green);border-radius:50%}
+  .logout-btn{background:none;border:none;color:var(--text3);font-size:11px;cursor:pointer;font-family:var(--font)}
+  .logout-btn:hover{color:var(--red)}
 
-  .chat-area::-webkit-scrollbar { width: 4px; }
-  .chat-area::-webkit-scrollbar-track { background: transparent; }
-  .chat-area::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  /* CHAT */
+  .chat-area{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:14px;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+  .message{display:flex;gap:10px;max-width:85%;animation:fadeIn .3s ease}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+  .message.user{align-self:flex-end;flex-direction:row-reverse}
+  .message.bot{align-self:flex-start}
+  .av{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+  .bot .av{background:linear-gradient(135deg,var(--accent),var(--accent2))}
+  .user .av{background:#1e3a5f}
+  .bd{padding:11px 15px;border-radius:14px;font-size:13.5px;line-height:1.7;white-space:pre-wrap}
+  .bot .bd{background:var(--bg3);border:1px solid var(--border);border-top-left-radius:3px}
+  .user .bd{background:#1e3a5f;border:1px solid rgba(96,165,250,0.12);border-top-right-radius:3px}
 
-  .message {
-    display: flex;
-    gap: 10px;
-    max-width: 85%;
-    animation: fadeIn 0.3s ease;
+  .duty-card{margin-top:8px;padding:10px;background:rgba(96,165,250,0.05);border:1px solid rgba(96,165,250,0.1);border-radius:10px;font-family:var(--mono);font-size:12.5px}
+  .duty-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.03)}
+  .duty-row:last-child{border-bottom:none}
+  .duty-label{color:var(--text2)}.duty-name{color:var(--accent);font-weight:500}
+
+  .bot-options{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+  .opt-btn{
+    padding:8px 16px;background:var(--bg);border:1px solid var(--border);border-radius:20px;
+    color:var(--text2);font-size:12.5px;font-family:var(--font);cursor:pointer;transition:all .2s;
   }
+  .opt-btn:hover{background:var(--glow);border-color:var(--accent);color:var(--accent)}
+  .opt-btn.sel{background:rgba(96,165,250,0.15);border-color:var(--accent);color:var(--accent)}
+  .opt-btn:disabled{opacity:.4;cursor:not-allowed}
 
-  /* ข้อความบอต (ตารางเวร) ใช้ความกว้างเต็มที่ */
-  .message.bot {
-    max-width: 100%;
-    align-self: flex-start;
-  }
+  .cfm-btns{display:flex;gap:10px;margin-top:12px}
+  .btn-ok,.btn-no{padding:10px 22px;border:none;border-radius:10px;font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
+  .btn-ok{background:linear-gradient(135deg,var(--green),#059669);color:#fff}
+  .btn-ok:hover{transform:scale(1.03)}
+  .btn-no{background:var(--bg3);border:1px solid var(--border);color:var(--text2)}
+  .btn-no:hover{border-color:var(--red);color:var(--red)}
 
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
+  .typing span{display:inline-block;width:6px;height:6px;background:var(--text3);border-radius:50%;animation:bounce 1.4s infinite;margin-right:3px}
+  .typing span:nth-child(2){animation-delay:.2s}.typing span:nth-child(3){animation-delay:.4s}
+  @keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
 
-  .message.user { align-self: flex-end; flex-direction: row-reverse; }
+  .quick-actions{padding:6px 20px;display:flex;gap:7px;flex-wrap:wrap;flex-shrink:0}
+  .qb{padding:7px 13px;background:var(--bg3);border:1px solid var(--border);border-radius:18px;color:var(--text2);font-size:12px;font-family:var(--font);cursor:pointer;transition:all .2s}
+  .qb:hover{background:var(--glow);border-color:var(--accent);color:var(--accent)}
+  .qb.swap-btn{border-color:rgba(251,191,36,0.3);color:var(--yellow)}
+  .qb.swap-btn:hover{background:rgba(251,191,36,0.1);border-color:var(--yellow)}
 
-  .message-avatar {
-    width: 32px; height: 32px;
-    border-radius: 10px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 15px;
-    flex-shrink: 0;
-  }
+  .input-area{padding:14px 20px 18px;background:var(--bg2);border-top:1px solid var(--border);flex-shrink:0}
+  .input-wrap{display:flex;gap:8px;align-items:center;background:var(--bgi);border:1px solid var(--border);border-radius:12px;padding:5px 5px 5px 16px;transition:border-color .2s}
+  .input-wrap:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--glow)}
+  .input-wrap input{flex:1;background:none;border:none;outline:none;color:var(--text);font-family:var(--font);font-size:13.5px}
+  .input-wrap input::placeholder{color:var(--text3)}
+  .send-btn{width:38px;height:38px;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:9px;color:#fff;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .15s}
+  .send-btn:hover{transform:scale(1.05)}.send-btn:disabled{opacity:.4;cursor:not-allowed}
 
-  .bot .message-avatar {
-    background: linear-gradient(135deg, var(--accent), #818cf8);
-  }
+  .welcome{text-align:center;padding:40px 20px;color:var(--text2)}
+  .welcome-icon{font-size:48px;margin-bottom:14px}
+  .welcome h2{font-size:18px;color:var(--text);font-weight:600;margin-bottom:4px}
+  .welcome p{font-size:12.5px;line-height:1.7}
 
-  .user .message-avatar {
-    background: var(--accent-dim);
-  }
-
-  .message-content {
-    padding: 12px 16px;
-    border-radius: 16px;
-    font-size: 14px;
-    line-height: 1.7;
-    white-space: pre-wrap;
-  }
-
-  .bot .message-content {
-    background: var(--bot-bubble);
-    border: 1px solid var(--border);
-    border-top-left-radius: 4px;
-  }
-
-  .user .message-content {
-    background: var(--user-bubble);
-    border: 1px solid rgba(56, 189, 248, 0.15);
-    border-top-right-radius: 4px;
-  }
-
-  .message-content .duty-card {
-    margin-top: 10px;
-    padding: 12px 16px;
-    background: rgba(56, 189, 248, 0.06);
-    border: 1px solid rgba(56, 189, 248, 0.12);
-    border-radius: 10px;
-    font-family: var(--font-mono);
-    font-size: 13px;
-    min-width: 0;
-  }
-
-  .duty-row {
-    display: flex;
-    align-items: flex-start;
-    gap: 16px;
-    padding: 6px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.04);
-  }
-
-  .duty-row:last-child { border-bottom: none; }
-  .duty-label {
-    color: var(--text-secondary);
-    flex-shrink: 0;
-    min-width: 100px;
-  }
-  .duty-name {
-    flex: 1;
-    min-width: 0;
-    color: var(--accent);
-    font-weight: 500;
-    word-break: break-word;
-    text-align: right;
-  }
-
-  /* Typing indicator */
-  .typing-indicator {
-    display: flex;
-    gap: 4px;
-    padding: 8px 0;
-  }
-
-  .typing-indicator span {
-    width: 7px; height: 7px;
-    background: var(--text-muted);
-    border-radius: 50%;
-    animation: bounce 1.4s infinite;
-  }
-
-  .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
-  .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
-
-  @keyframes bounce {
-    0%, 60%, 100% { transform: translateY(0); }
-    30% { transform: translateY(-6px); }
-  }
-
-  /* Quick Actions — ซ่อน/แสดงได้ */
-  .quick-actions-wrap {
-    width: 100%;
-    flex-shrink: 0;
-    border-top: 1px solid var(--border);
-  }
-
-  .quick-actions-toggle {
-    width: 100%;
-    padding: 6px 24px;
-    background: var(--bg-secondary);
-    border: none;
-    color: var(--text-muted);
-    font-size: 12px;
-    font-family: var(--font-main);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    transition: color 0.2s;
-  }
-
-  .quick-actions-toggle:hover {
-    color: var(--accent);
-  }
-
-  .quick-actions {
-    width: 100%;
-    padding: 8px 24px;
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    flex-shrink: 0;
-    transition: opacity 0.2s, max-height 0.25s ease-out;
-    overflow: hidden;
-  }
-
-  .quick-actions.quick-actions--hidden {
-    display: none;
-  }
-
-  .quick-btn {
-    padding: 8px 14px;
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    color: var(--text-secondary);
-    font-size: 12.5px;
-    font-family: var(--font-main);
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-
-  .quick-btn:hover {
-    background: var(--accent-glow);
-    border-color: var(--accent);
-    color: var(--accent);
-  }
-
-  /* Input Area — ด้านล่างเว้น safe area ให้มือถือ (ไม่บังแชท) */
-  .input-area {
-    width: 100%;
-    padding: 16px 24px 20px;
-    padding-bottom: max(20px, env(safe-area-inset-bottom, 0px));
-    background: var(--bg-secondary);
-    border-top: 1px solid var(--border);
-    flex-shrink: 0;
-  }
-
-  .input-wrapper {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    background: var(--bg-input);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 6px 6px 6px 18px;
-    transition: border-color 0.2s;
-  }
-
-  .input-wrapper:focus-within {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px var(--accent-glow);
-  }
-
-  .input-wrapper input {
-    flex: 1;
-    background: none;
-    border: none;
-    outline: none;
-    color: var(--text-primary);
-    font-family: var(--font-main);
-    font-size: 14px;
-  }
-
-  .input-wrapper input::placeholder { color: var(--text-muted); }
-
-  .send-btn {
-    width: 40px; height: 40px;
-    background: linear-gradient(135deg, var(--accent), #818cf8);
-    border: none;
-    border-radius: 10px;
-    color: white;
-    font-size: 18px;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    transition: transform 0.15s, opacity 0.2s;
-  }
-
-  .send-btn:hover { transform: scale(1.05); }
-  .send-btn:active { transform: scale(0.95); }
-  .send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-
-  .footer-note {
-    text-align: center;
-    font-size: 11px;
-    color: var(--text-muted);
-    margin-top: 8px;
-  }
-
-  .footer-copyright {
-    text-align: right;
-    font-size: 10px;
-    color: var(--text-muted);
-    margin-top: 6px;
-    opacity: 0.8;
-  }
-
-  /* Welcome */
-  .welcome {
-    text-align: center;
-    padding: 40px 20px;
-    color: var(--text-secondary);
-  }
-
-  .welcome-icon {
-    font-size: 48px;
-    margin-bottom: 16px;
-  }
-
-  .welcome h2 {
-    font-size: 20px;
-    color: var(--text-primary);
-    font-weight: 600;
-    margin-bottom: 6px;
-  }
-
-  .welcome p { font-size: 13px; line-height: 1.6; }
-
-  @media (max-width: 600px) {
-    .message { max-width: 92%; }
-    .message.bot { max-width: 100%; }
-    .header { padding: 12px 16px; }
-    .chat-area {
-      padding: 16px;
-      padding-bottom: max(16px, env(safe-area-inset-bottom, 0px));
-    }
-    .input-area {
-      padding: 12px 16px;
-      padding-bottom: max(16px, env(safe-area-inset-bottom, 0px));
-    }
-    .quick-actions { padding: 8px 16px; }
-  }
+  @media(max-width:600px){.message{max-width:92%}.modal-box{width:90%;padding:28px 22px}}
 </style>
 </head>
 <body>
 
+<!-- LOGIN MODAL — ขึ้นเฉพาะตอนกดแลกเวร -->
+<div class="modal-overlay" id="loginModal">
+  <div class="modal-box" style="position:relative">
+    <button class="modal-close" onclick="closeLogin()">✕</button>
+    <div style="font-size:36px;margin-bottom:12px">🔐</div>
+    <h3>ยืนยันตัวตนเพื่อแลกเวร</h3>
+    <p>เข้าสู่ระบบก่อนทำรายการแลกเวรค่ะ</p>
+    <select class="m-field" id="loginName"><option value="">— เลือกชื่อ —</option></select>
+    <input class="m-field" type="password" id="loginPin" placeholder="รหัส PIN (4 หลัก)" maxlength="6"
+           onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="m-btn" onclick="doLogin()">เข้าสู่ระบบ</button>
+    <div class="m-error" id="loginError"></div>
+  </div>
+</div>
+
+<!-- DATE PICKER MODAL — เลือกวันอื่น -->
+<div class="modal-overlay" id="dateModal">
+  <div class="modal-box" style="position:relative">
+    <button class="modal-close" onclick="closeDatePicker()">✕</button>
+    <div style="font-size:32px;margin-bottom:10px">📅</div>
+    <h3>เลือกวันที่อื่น</h3>
+    <p>
+      เลือกได้ <b>อย่างใดอย่างหนึ่ง</b><br>
+      - กดปุ่มด้านล่างเพื่อเปิดปฏิทินแล้วแตะวันที่<br>
+      <span style="font-size:12px;color:#9ca3af">หรือ</span><br>
+      - กรอกวันที่ในช่องด้านล่างนี้ รูปแบบ <b>วัน/เดือน/ปี พ.ศ.</b> (เช่น 3/3/2568)
+    </p>
+    <button type="button" class="m-btn-secondary" onclick="openNativeCalendar()">
+      <span class="icon">📅</span>
+      <span>แตะเพื่อเลือกวันที่จากปฏิทิน (เหมาะกับมือถือ)</span>
+    </button>
+    <input class="m-field" type="date" id="customDate">
+    <input class="m-field" type="text" id="customDateThai" placeholder="เช่น 3/3/2568 (วัน/เดือน/ปี พ.ศ.)">
+    <button class="m-btn" onclick="confirmDatePicker()">ตกลง</button>
+    <div class="m-error" id="dateError"></div>
+  </div>
+</div>
+
+<!-- HEADER -->
 <div class="header">
   <div class="header-icon">📋</div>
   <div class="header-text">
-    <h1>ระบบถามเวรอายุรกรรม</h1>
-    <p>ถามได้เลย เช่น "ใครเวรวันนี้"</p>
+    <h1>ระบบถามเวร</h1>
+    <p>ถามเวรได้เลย ไม่ต้องเข้าสู่ระบบ</p>
   </div>
-  <div class="status-dot"></div>
+  <div class="header-user" id="headerUser">
+    <span class="dot"></span>
+    <span id="displayName"></span>
+    <button class="logout-btn" onclick="doLogout()">ออก</button>
+  </div>
 </div>
 
+<!-- CHAT -->
 <div class="chat-area" id="chatArea">
   <div class="welcome">
     <div class="welcome-icon">🩺</div>
     <h2>สวัสดีค่ะ! ถามเรื่องเวรได้เลย</h2>
-    <p>ระบบเชื่อมต่อกับ Google Sheet ตารางเวร<br>ถามเป็นภาษาธรรมชาติได้เลยค่ะ</p>
+    <p>ไม่ต้องเข้าสู่ระบบ ถามได้ทันที<br>เข้าสู่ระบบเฉพาะเมื่อต้องการ <b>แลกเวร</b> เท่านั้น</p>
   </div>
 </div>
 
-<div class="quick-actions-wrap">
-  <button type="button" class="quick-actions-toggle" id="quickActionsToggle" onclick="toggleQuickActions()" aria-expanded="true">
-    <span id="quickActionsLabel">ซ่อนปุ่มคำถามสำเร็จรูป</span>
-    <span id="quickActionsIcon">▼</span>
-  </button>
-  <div class="quick-actions" id="quickActions">
-    <button class="quick-btn" onclick="askQuestion('ใครเวรวันนี้')">📅 ใครเวรวันนี้?</button>
-    <button class="quick-btn" onclick="askQuestion('ใครเวรพรุ่งนี้')">🔜 ใครเวรพรุ่งนี้?</button>
-    <button class="quick-btn" onclick="askQuestion('ตารางเวรสัปดาห์นี้')">🗓️ เวรสัปดาห์นี้</button>
-    <button class="quick-btn" onclick="askQuestion('มีแลกเวรอะไรบ้าง')">🔄 มีแลกเวรอะไรบ้าง</button>
-    <button class="quick-btn" onclick="askQuestion('เวรของหมอสุพจน์วันไหน')">👤 เวรของหมอสุพจน์</button>
-    <button class="quick-btn" onclick="promptPersonDuty()">👤 เวรของใครคนหนึ่ง</button>
-  </div>
+<!-- QUICK ACTIONS -->
+<div class="quick-actions">
+  <button class="qb" onclick="ask('ใครเวรวันนี้')">📅 เวรวันนี้</button>
+  <button class="qb" onclick="ask('ใครเวรพรุ่งนี้')">🔜 พรุ่งนี้</button>
+  <button class="qb" onclick="ask('ตารางเวรสัปดาห์นี้')">🗓️ สัปดาห์</button>
+  <button class="qb" onclick="ask('เวร ICU เดือนนี้')">🏥 ICU</button>
+  <button class="qb swap-btn" onclick="onSwapClick()">🔄 แลกเวร</button>
+  <button class="qb" onclick="ask('มีแลกเวรอะไรบ้าง')">📝 ดูแลกเวร</button>
 </div>
 
+<!-- INPUT -->
 <div class="input-area">
-  <div class="input-wrapper">
-    <input type="text" id="userInput" placeholder="ถามเรื่องเวรได้เลย..." 
-           onkeydown="if(event.key==='Enter')sendMessage()">
-    <button class="send-btn" id="sendBtn" onclick="sendMessage()">➤</button>
+  <div class="input-wrap">
+    <input type="text" id="userInput" placeholder="ถามเวรได้เลย ไม่ต้อง login..."
+           onkeydown="if(event.key==='Enter')sendMsg()">
+    <button class="send-btn" id="sendBtn" onclick="sendMsg()">➤</button>
   </div>
-  <div class="footer-note">เชื่อมต่อกับ Google Sheet + Hugging Face AI</div>
-  <div class="footer-copyright">© 2026 directed by Uradev</div>
 </div>
 
 <script>
-// =============================================
-// CONFIG — URL มาจาก .env (server.js แทนที่ __APPS_SCRIPT_URL__ ตอนส่งหน้า)
-// เปิดไฟล์ตรงๆ = โหมด demo | รัน npm start แล้วเปิด http://localhost:3780 = ใช้ URL จาก .env
-// =============================================
+// Local: server.js แทนที่ __APPS_SCRIPT_URL__ จาก .env | Vercel: build แทนที่จาก APPS_SCRIPT_URL
 const APPS_SCRIPT_URL = '__APPS_SCRIPT_URL__';
-
 const chatArea = document.getElementById('chatArea');
 const userInput = document.getElementById('userInput');
-const sendBtn = document.getElementById('sendBtn');
 
-function toggleQuickActions() {
-  const el = document.getElementById('quickActions');
-  const label = document.getElementById('quickActionsLabel');
-  const icon = document.getElementById('quickActionsIcon');
-  const toggle = document.getElementById('quickActionsToggle');
-  const hidden = el.classList.toggle('quick-actions--hidden');
-  label.textContent = hidden ? 'แสดงปุ่มคำถามสำเร็จรูป' : 'ซ่อนปุ่มคำถามสำเร็จรูป';
-  icon.textContent = hidden ? '▶' : '▼';
-  toggle.setAttribute('aria-expanded', !hidden);
+let currentUser = null;  // null = ยังไม่ login
+let wizard = null;       // swap wizard state
+let datePickCb = null;   // callback หลังเลือกวันจาก calendar
+
+// =============================================
+// 💬 Chat helpers
+// =============================================
+function addBot(t, html=false) {
+  rmWelcome();
+  const m=el('div','message bot');
+  m.innerHTML=`<div class="av">🤖</div><div class="bd">${html?t:esc(t)}</div>`;
+  chatArea.appendChild(m); scroll();
+}
+function addBotOpts(t, opts, cb) {
+  rmWelcome();
+  const m=el('div','message bot');
+  let h='<div class="bot-options">';
+  opts.forEach((o,i)=>h+=`<button class="opt-btn" data-i="${i}">${esc(o.label)}</button>`);
+  h+='</div>';
+  m.innerHTML=`<div class="av">🤖</div><div class="bd">${esc(t)}\n${h}</div>`;
+  chatArea.appendChild(m); scroll();
+  m.querySelectorAll('.opt-btn').forEach(b=>b.onclick=function(){
+    m.querySelectorAll('.opt-btn').forEach(x=>x.disabled=true);
+    this.classList.add('sel');
+    addUser(opts[parseInt(this.dataset.i)].label);
+    cb(opts[parseInt(this.dataset.i)].value);
+  });
+}
+function addBotConfirm(t, onOk, onNo) {
+  rmWelcome();
+  const m=el('div','message bot');
+  m.innerHTML=`<div class="av">🤖</div><div class="bd">${t}<div class="cfm-btns"><button class="btn-ok">✅ ยืนยันแลกเวร</button><button class="btn-no">❌ ยกเลิก</button></div></div>`;
+  chatArea.appendChild(m); scroll();
+  m.querySelector('.btn-ok').onclick=function(){dis(m);addUser('ยืนยัน');onOk()};
+  m.querySelector('.btn-no').onclick=function(){dis(m);addUser('ยกเลิก');onNo()};
+}
+function addUser(t) {
+  const m=el('div','message user');
+  m.innerHTML=`<div class="av">👤</div><div class="bd">${esc(t)}</div>`;
+  chatArea.appendChild(m); scroll();
+}
+function showTyp(){const m=el('div','message bot');m.id='typ';m.innerHTML=`<div class="av">🤖</div><div class="bd"><span class="typing"><span></span><span></span><span></span></span></div>`;chatArea.appendChild(m);scroll()}
+function rmTyp(){document.getElementById('typ')?.remove()}
+function rmWelcome(){chatArea.querySelector('.welcome')?.remove()}
+function scroll(){chatArea.scrollTop=chatArea.scrollHeight}
+function el(tag,cls){const e=document.createElement(tag);e.className=cls;return e}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function dis(m){m.querySelectorAll('button').forEach(b=>b.disabled=true)}
+function wait(ms){return new Promise(r=>setTimeout(r,ms))}
+function fmtISO(d){return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
+// แปลงวันที่แบบไทย (วัน/เดือน/ปี พ.ศ.) → YYYY-MM-DD (ค.ศ.)
+function parseThaiDateToISO(s){
+  s = s.trim();
+  const parts = s.split(/[\/\-\.]/);
+  if (parts.length !== 3) return null;
+  let d = parseInt(parts[0],10);
+  let m = parseInt(parts[1],10);
+  let y = parseInt(parts[2],10);
+  if (!d || !m || !y) return null;
+  // แปลง พ.ศ. → ค.ศ. ถ้ามากกว่า 2400 ถือว่าเป็น พ.ศ.
+  if (y > 2400) y = y - 543;
+  if (m < 1 || m > 12 || d < 1 || d > 31) return null;
+  const dt = new Date(y, m-1, d);
+  if (isNaN(dt.getTime())) return null;
+  return fmtISO(dt);
 }
 
-function addMessage(text, sender, isHTML = false) {
-  // Remove welcome message
-  const welcome = chatArea.querySelector('.welcome');
-  if (welcome) welcome.remove();
-
-  const msg = document.createElement('div');
-  msg.className = `message ${sender}`;
-  msg.innerHTML = `
-    <div class="message-avatar">${sender === 'bot' ? '🤖' : '👤'}</div>
-    <div class="message-content">${isHTML ? text : escapeHTML(text)}</div>
-  `;
-  chatArea.appendChild(msg);
-  chatArea.scrollTop = chatArea.scrollHeight;
-  return msg;
+// =============================================
+// 🔐 LOGIN — ขึ้นเฉพาะตอนแลกเวร
+// =============================================
+function showLogin() {
+  document.getElementById('loginModal').classList.add('show');
+  document.getElementById('loginError').textContent = '';
+  document.getElementById('loginPin').value = '';
+}
+function closeLogin() {
+  document.getElementById('loginModal').classList.remove('show');
 }
 
-function escapeHTML(str) {
-  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-
-function showTyping() {
-  const msg = document.createElement('div');
-  msg.className = 'message bot';
-  msg.id = 'typing';
-  msg.innerHTML = `
-    <div class="message-avatar">🤖</div>
-    <div class="message-content">
-      <div class="typing-indicator">
-        <span></span><span></span><span></span>
-      </div>
-    </div>
-  `;
-  chatArea.appendChild(msg);
-  chatArea.scrollTop = chatArea.scrollHeight;
-}
-
-function removeTyping() {
-  const el = document.getElementById('typing');
-  if (el) el.remove();
-}
-
-function askQuestion(text) {
-  userInput.value = text;
-  sendMessage();
-}
-
-// กดปุ่ม "เวรของใครคนหนึ่ง" → ให้พิมพ์ชื่อในช่อง แล้วกดส่ง
-function promptPersonDuty() {
-  userInput.value = 'เวรของ ';
-  userInput.placeholder = 'พิมพ์ชื่อแพทย์ต่อ เช่น หมอสุพจน์ หรือ หมอสุพจน์วันไหน';
-  userInput.focus();
-}
-
-async function sendMessage() {
-  const text = userInput.value.trim();
-  if (!text) return;
-
-  addMessage(text, 'user');
-  userInput.value = '';
-  userInput.placeholder = 'ถามเรื่องเวรได้เลย...';
-  sendBtn.disabled = true;
-  showTyping();
+async function doLogin() {
+  const name = document.getElementById('loginName').value;
+  const pin = document.getElementById('loginPin').value;
+  const err = document.getElementById('loginError');
+  if (!name) { err.textContent='กรุณาเลือกชื่อ'; return; }
+  if (!pin) { err.textContent='กรุณาใส่ PIN'; return; }
+  err.textContent = 'กำลังตรวจสอบ...';
 
   try {
     const res = await fetch(APPS_SCRIPT_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ question: text })
+      method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body: JSON.stringify({ action:'login', name, pin })
     });
     const data = await res.json();
-    removeTyping();
-
-    if (data.success) {
-      addMessage(data.answer, 'bot', true);
+    if (data.success && data.authenticated) {
+      currentUser = { name: data.name, role: data.role };
+      closeLogin();
+      document.getElementById('headerUser').classList.add('show');
+      document.getElementById('displayName').textContent = currentUser.name;
+      addBot(`🔓 เข้าสู่ระบบสำเร็จ — ${currentUser.name}\nเริ่มกระบวนการแลกเวรค่ะ`);
+      await wait(400);
+      startSwapWizard();
     } else {
-      addMessage('ขอโทษค่ะ เกิดข้อผิดพลาด: ' + (data.error || 'ไม่ทราบสาเหตุ'), 'bot');
+      err.textContent = '❌ ชื่อหรือ PIN ไม่ถูกต้อง';
     }
-  } catch (err) {
-    removeTyping();
-    addMessage('ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้ กรุณาลองใหม่ค่ะ', 'bot');
-    console.error(err);
+  } catch (e) {
+    err.textContent = 'ไม่สามารถเชื่อมต่อ server ได้';
+  }
+}
+
+function doLogout() {
+  currentUser = null;
+  wizard = null;
+  document.getElementById('headerUser').classList.remove('show');
+  addBot('🔒 ออกจากระบบแล้ว ถามเวรได้ตามปกติค่ะ\nถ้าจะแลกเวร กดปุ่ม 🔄 อีกครั้ง');
+}
+
+// =============================================
+// 🔄 กดแลกเวร → เช็ค login ก่อน
+// =============================================
+function onSwapClick() {
+  if (currentUser) {
+    // ล็อกอินแล้ว → เริ่ม wizard เลย
+    startSwapWizard();
+  } else {
+    // ยังไม่ได้ล็อกอิน → ขึ้น popup
+    addBot('🔐 ต้องยืนยันตัวตนก่อนแลกเวรค่ะ');
+    showLogin();
+  }
+}
+
+// =============================================
+// 🔄 SWAP WIZARD
+// =============================================
+async function startSwapWizard() {
+  wizard = {};
+  addBot('🔄 เริ่มกระบวนการแลกเวร');
+  await wait(400);
+  // Step 1: ประเภทเวร
+  addBotOpts('ขั้นที่ 1/5 — เลือกประเภทเวร:', [
+    { label:'📞 Consult', value:'Consult' },
+    { label:'🏥 ICU', value:'ICU' }
+  ], v=>{ wizard.dutyType=v; step2(); });
+}
+
+async function step2() {
+  await wait(400);
+  const days=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
+  const opts=[];
+  for(let i=0;i<=13;i++){
+    const d=new Date();d.setDate(d.getDate()+i);
+    const lbl=i===0?'วันนี้':i===1?'พรุ่งนี้':`${days[d.getDay()]}`;
+    opts.push({label:`${lbl} ${d.getDate()}/${d.getMonth()+1}`,value:fmtISO(d)});
+  }
+  // เพิ่มปุ่ม "เลือกวันอื่น..." เพื่อเปิด calendar
+  opts.unshift({label:'📅 เลือกวันอื่น...', value:'__calendar__'});
+  addBotOpts('ขั้นที่ 2/5 — เลือกวันที่:', opts.slice(0,8), v=>{
+    if (v === '__calendar__') {
+      openDatePicker();
+    } else {
+      wizard.date = v;
+      step3();
+    }
+  });
+}
+
+function openDatePicker() {
+  datePickCb = function(dateStr) {
+    wizard.date = dateStr;
+    step3();
+  };
+  const input = document.getElementById('customDate');
+  const inputTh = document.getElementById('customDateThai');
+  input.value = '';
+  input.min = fmtISO(new Date());
+  inputTh.value = '';
+  document.getElementById('dateError').textContent = '';
+  document.getElementById('dateModal').classList.add('show');
+}
+
+function openNativeCalendar() {
+  const input = document.getElementById('customDate');
+  if (!input) return;
+  // showPicker รองรับบน Chrome / Edge ใหม่ ๆ ถ้าไม่มีให้โฟกัสที่ช่องแทน
+  if (input.showPicker) {
+    input.showPicker();
+  } else {
+    input.focus();
+  }
+}
+
+function closeDatePicker() {
+  document.getElementById('dateModal').classList.remove('show');
+}
+
+function confirmDatePicker() {
+  const input = document.getElementById('customDate');
+  const inputTh = document.getElementById('customDateThai');
+  const err = document.getElementById('dateError');
+
+  // ถ้ากรอกแบบไทย (วัน/เดือน/ปี พ.ศ.) ให้ใช้ค่านี้เป็นหลัก
+  const thVal = inputTh.value.trim();
+  if (thVal) {
+    const iso = parseThaiDateToISO(thVal);
+    if (!iso) {
+      err.textContent = 'รูปแบบวันที่ไม่ถูกต้อง (ตัวอย่าง 3/3/2568)';
+      return;
+    }
+    closeDatePicker();
+    if (datePickCb) datePickCb(iso);
+    return;
   }
 
-  sendBtn.disabled = false;
+  // ถ้าไม่กรอกแบบไทย ให้ใช้ค่าจากปฏิทินปกติ
+  if (!input.value) {
+    err.textContent = 'กรุณาเลือกวันที่';
+    return;
+  }
+  closeDatePicker();
+  if (datePickCb) datePickCb(input.value);
+}
+
+async function step3() {
+  await wait(400);
+  showTyp();
+  try {
+    const res = await fetch(APPS_SCRIPT_URL, {
+      method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body: JSON.stringify({ action:'get_duty_for_date', date:wizard.date, dutyType:wizard.dutyType })
+    });
+    const data = await res.json();
+    rmTyp();
+    if (data.success) {
+      wizard.originalDoctor = data.doctor;
+      const dd = new Date(wizard.date);
+      const days=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
+
+      addBot(`ขั้นที่ 3/5 — เวร ${wizard.dutyType} วัน${days[dd.getDay()]}ที่ ${dd.getDate()}/${dd.getMonth()+1}\n\n📋 เวรเดิมของวันนี้: <b>${data.doctor}</b>`, true);
+      await wait(400);
+
+      if (data.allPeople) {
+        const opts = data.allPeople.filter(n=>n!==data.doctor).map(n=>({label:`👨‍⚕️ ${n}`,value:n}));
+        addBotOpts('เลือกแพทย์ที่จะมาแทน:', opts, v=>{ wizard.replacement=v; step4(); });
+      }
+    } else { addBot('⚠️ ดึงข้อมูลไม่ได้: '+(data.error||'')); }
+  } catch(e) { rmTyp(); addBot('⚠️ เชื่อมต่อไม่ได้'); }
+}
+
+async function step4() {
+  await wait(400);
+  addBotOpts('ขั้นที่ 4/5 — เหตุผล:', [
+    {label:'📅 ติดประชุม',value:'ติดประชุม'},
+    {label:'🤒 ลาป่วย',value:'ลาป่วย'},
+    {label:'✈️ ลาพักร้อน',value:'ลาพักร้อน'},
+    {label:'🔄 สลับเวร',value:'สลับเวร'},
+    {label:'📝 อื่นๆ (พิมพ์)',value:'__custom__'}
+  ], v=>{
+    if(v==='__custom__'){addBot('กรุณาพิมพ์เหตุผล:');wizard.waitReason=true;}
+    else{wizard.reason=v;step5();}
+  });
+}
+
+async function step5() {
+  await wait(400);
+  const dd=new Date(wizard.date);
+  const days=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
+  const summary = `ขั้นที่ 5/5 — ตรวจสอบข้อมูล\n\n`+
+    `<div class="duty-card">`+
+    `<div class="duty-row"><span class="duty-label">📅 วันที่</span><span class="duty-name">${dd.getDate()}/${dd.getMonth()+1} (${days[dd.getDay()]})</span></div>`+
+    `<div class="duty-row"><span class="duty-label">📋 ประเภท</span><span class="duty-name">${wizard.dutyType}</span></div>`+
+    `<div class="duty-row"><span class="duty-label">👤 เดิม</span><span class="duty-name">${wizard.originalDoctor}</span></div>`+
+    `<div class="duty-row"><span class="duty-label">🔄 แทนโดย</span><span class="duty-name">${wizard.replacement}</span></div>`+
+    `<div class="duty-row"><span class="duty-label">💬 เหตุผล</span><span class="duty-name">${wizard.reason}</span></div>`+
+    `<div class="duty-row"><span class="duty-label">📝 บันทึกโดย</span><span class="duty-name">${currentUser.name}</span></div>`+
+    `</div>`;
+  addBotConfirm(summary, doConfirmSwap, ()=>{addBot('❌ ยกเลิกแล้วค่ะ');wizard=null;});
+}
+
+async function doConfirmSwap() {
+  showTyp();
+  try {
+    const res = await fetch(APPS_SCRIPT_URL, {
+      method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body: JSON.stringify({
+        action:'confirm_swap',
+        swapData:{
+          date:wizard.date, dutyType:wizard.dutyType,
+          original:wizard.originalDoctor, replacement:wizard.replacement,
+          reason:wizard.reason, recordedBy:currentUser.name
+        }
+      })
+    });
+    const data = await res.json();
+    rmTyp();
+    addBot(data.success ? data.answer : '⚠️ '+(data.error||''), true);
+  } catch(e) { rmTyp(); addBot('⚠️ เชื่อมต่อไม่ได้'); }
+  wizard = null;
+}
+
+// =============================================
+// 📨 SEND MESSAGE (ถามเวร = ไม่ต้อง login)
+// =============================================
+function ask(t){ userInput.value=t; sendMsg(); }
+
+async function sendMsg() {
+  const t=userInput.value.trim();
+  if(!t) return;
+  addUser(t); userInput.value='';
+
+  // wizard waiting reason
+  if(wizard?.waitReason){wizard.reason=t;wizard.waitReason=false;step5();return;}
+
+  document.getElementById('sendBtn').disabled=true;
+  showTyp();
+  try {
+    const res = await fetch(APPS_SCRIPT_URL, {
+      method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body: JSON.stringify({ action:'ask', question:t })
+    });
+    const data = await res.json();
+    rmTyp();
+    const errMsg = (data && data.error) ? data.error : 'เกิดข้อผิดพลาด';
+    addBot(data.success ? data.answer : ('⚠️ ' + errMsg), true);
+  } catch(e) { rmTyp(); addBot('เชื่อมต่อไม่ได้ ลองใหม่ค่ะ'); }
+  document.getElementById('sendBtn').disabled=false;
   userInput.focus();
 }
 
 // =============================================
-// DEMO MODE — ใช้เมื่อไม่มี URL จาก .env (เปิดไฟล์ตรงๆ หรือ server ไม่มี .env)
+// Load people list for login dropdown
 // =============================================
-if (APPS_SCRIPT_URL === '__APPS_SCRIPT_URL__' || APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_WEB_APP_URL') {
-  const originalSend = sendMessage;
-  sendMessage = async function() {
-    const text = userInput.value.trim();
-    if (!text) return;
-
-    addMessage(text, 'user');
-    userInput.value = '';
-    sendBtn.disabled = true;
-    showTyping();
-
-    await new Promise(r => setTimeout(r, 1200));
-    removeTyping();
-
-    // Demo responses
-    const demoSchedule = {
-      'จันทร์': { เช้า: 'หมอก้อง', บ่าย: 'หมอแอน', ดึก: 'หมอนิด' },
-      'อังคาร': { เช้า: 'หมอบี', บ่าย: 'หมอก้อง', ดึก: 'หมอแอน' },
-      'พุธ': { เช้า: 'หมอนิด', บ่าย: 'หมอบี', ดึก: 'หมอก้อง' },
-      'พฤหัสบดี': { เช้า: 'หมอแอน', บ่าย: 'หมอนิด', ดึก: 'หมอบี' },
-      'ศุกร์': { เช้า: 'หมอก้อง', บ่าย: 'หมอแอน', ดึก: 'หมอนิด' },
-      'เสาร์': { เช้า: 'หมอบี', บ่าย: 'หมอนิด', ดึก: 'หมอแอน' },
-      'อาทิตย์': { เช้า: 'หมอแอน', บ่าย: 'หมอก้อง', ดึก: 'หมอบี' }
-    };
-
-    const days = ['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
-    const today = days[new Date().getDay()];
-    const todayDuty = demoSchedule[today];
-
-    let answer;
-
-    if (text.includes('วันนี้') || text.includes('ใครเวร')) {
-      answer = `📋 เวรวันนี้ (วัน${today}) ค่ะ
-<div class="duty-card">
-  <div class="duty-row"><span class="duty-label">🌅 เวรเช้า</span><span class="duty-name">${todayDuty.เช้า}</span></div>
-  <div class="duty-row"><span class="duty-label">☀️ เวรบ่าย</span><span class="duty-name">${todayDuty.บ่าย}</span></div>
-  <div class="duty-row"><span class="duty-label">🌙 เวรดึก</span><span class="duty-name">${todayDuty.ดึก}</span></div>
-</div>`;
-    } else if (text.includes('พรุ่งนี้')) {
-      const tmr = days[(new Date().getDay() + 1) % 7];
-      const tmrDuty = demoSchedule[tmr];
-      answer = `📋 เวรพรุ่งนี้ (วัน${tmr}) ค่ะ
-<div class="duty-card">
-  <div class="duty-row"><span class="duty-label">🌅 เวรเช้า</span><span class="duty-name">${tmrDuty.เช้า}</span></div>
-  <div class="duty-row"><span class="duty-label">☀️ เวรบ่าย</span><span class="duty-name">${tmrDuty.บ่าย}</span></div>
-  <div class="duty-row"><span class="duty-label">🌙 เวรดึก</span><span class="duty-name">${tmrDuty.ดึก}</span></div>
-</div>`;
-    } else if (text.includes('สัปดาห์')) {
-      let table = '📋 ตารางเวรสัปดาห์นี้\n<div class="duty-card">';
-      for (const [day, duty] of Object.entries(demoSchedule)) {
-        table += `<div class="duty-row"><span class="duty-label">${day}</span><span class="duty-name">${duty.เช้า} / ${duty.บ่าย} / ${duty.ดึก}</span></div>`;
-      }
-      table += '</div>';
-      answer = table;
-    } else if (text.includes('หมอก้อง')) {
-      answer = `👨‍⚕️ ตารางเวรของ <b>หมอก้อง</b>
-<div class="duty-card">
-  <div class="duty-row"><span class="duty-label">จันทร์</span><span class="duty-name">เช้า</span></div>
-  <div class="duty-row"><span class="duty-label">อังคาร</span><span class="duty-name">บ่าย</span></div>
-  <div class="duty-row"><span class="duty-label">พุธ</span><span class="duty-name">ดึก</span></div>
-  <div class="duty-row"><span class="duty-label">ศุกร์</span><span class="duty-name">เช้า</span></div>
-  <div class="duty-row"><span class="duty-label">อาทิตย์</span><span class="duty-name">บ่าย</span></div>
-</div>`;
-    } else {
-      answer = '🤔 ขอโทษค่ะ ไม่เข้าใจคำถาม ลองถามใหม่ เช่น "ใครเวรวันนี้" ค่ะ';
+async function loadPeople() {
+  try {
+    const res = await fetch(APPS_SCRIPT_URL, {
+      method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body: JSON.stringify({ action:'get_people' })
+    });
+    const data = await res.json();
+    if(data.success && data.people) {
+      const sel=document.getElementById('loginName');
+      data.people.forEach(n=>{const o=document.createElement('option');o.value=n;o.textContent=n;sel.appendChild(o);});
     }
+  } catch(e){}
+}
+loadPeople();
 
-    addMessage(answer, 'bot', true);
-    sendBtn.disabled = false;
-    userInput.focus();
+// =============================================
+// DEMO MODE
+// =============================================
+if(!APPS_SCRIPT_URL||APPS_SCRIPT_URL==='__APPS_SCRIPT_URL__'||APPS_SCRIPT_URL==='YOUR_APPS_SCRIPT_WEB_APP_URL'){
+  const dp=['หมอแอ๊นท์','หมอครีม','หมอวี','หมอผึ้ง','หมอมีนา','หมอพจน์'];
+  const sel=document.getElementById('loginName');
+  dp.forEach(n=>{const o=document.createElement('option');o.value=n;o.textContent=n;sel.appendChild(o);});
+
+  doLogin=async function(){
+    const name=document.getElementById('loginName').value;
+    const pin=document.getElementById('loginPin').value;
+    const err=document.getElementById('loginError');
+    if(!name){err.textContent='กรุณาเลือกชื่อ';return;}
+    if(!pin){err.textContent='กรุณาใส่ PIN';return;}
+    if(pin!=='1234'){err.textContent='❌ PIN ไม่ถูกต้อง (Demo: 1234)';return;}
+    currentUser={name,role:'doctor'};
+    closeLogin();
+    document.getElementById('headerUser').classList.add('show');
+    document.getElementById('displayName').textContent=name;
+    addBot(`🔓 เข้าสู่ระบบ — ${name}\nเริ่มแลกเวรค่ะ`);
+    await wait(400); startSwapWizard();
   };
 
-  // Show demo notice
-  setTimeout(() => {
-    addMessage('⚡ โหมดทดสอบ — กดปุ่มด้านล่างหรือพิมพ์ถามได้เลยค่ะ (ยังไม่ได้ต่อ backend)', 'bot');
-  }, 500);
+  step3=async function(){
+    await wait(500);
+    const dd=new Date(wizard.date);
+    const days=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
+    const doc=dp[dd.getDay()%dp.length];
+    wizard.originalDoctor=doc;
+    addBot(`ขั้นที่ 3/5 — เวร ${wizard.dutyType} วัน${days[dd.getDay()]}ที่ ${dd.getDate()}/${dd.getMonth()+1}\n\n📋 เวรเดิม: <b>${doc}</b>`,true);
+    await wait(400);
+    addBotOpts('เลือกแพทย์ที่จะมาแทน:',dp.filter(n=>n!==doc).map(n=>({label:`👨‍⚕️ ${n}`,value:n})),v=>{wizard.replacement=v;step4();});
+  };
+
+  doConfirmSwap=async function(){
+    showTyp();await wait(800);rmTyp();
+    const now=new Date();const ts=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+    addBot(`✅ บันทึกแลกเวรเรียบร้อย! (Demo)\n\n<div class="duty-card"><div class="duty-row"><span class="duty-label">📝 โดย</span><span class="duty-name">${currentUser.name}</span></div><div class="duty-row"><span class="duty-label">🕐 เวลา</span><span class="duty-name">${ts}</span></div></div>`,true);
+    wizard=null;
+  };
+
+  sendMsg=async function(){
+    const t=userInput.value.trim();if(!t)return;
+    addUser(t);userInput.value='';
+    if(wizard?.waitReason){wizard.reason=t;wizard.waitReason=false;step5();return;}
+    showTyp();await wait(800);rmTyp();
+    const q=t.toLowerCase();
+    const days=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
+    const today=days[new Date().getDay()];
+    if(q.includes('วันนี้')||q.includes('ใครเวร'))
+      addBot(`📋 เวรวัน${today}\n<div class="duty-card"><div class="duty-row"><span class="duty-label">🏥 ICU</span><span class="duty-name">หมอครีม</span></div><div class="duty-row"><span class="duty-label">📞 Consult</span><span class="duty-name">หมอแอ๊นท์</span></div></div>`,true);
+    else if(q.includes('พรุ่งนี้')){const tm=days[(new Date().getDay()+1)%7];addBot(`📋 เวรวัน${tm}\n<div class="duty-card"><div class="duty-row"><span class="duty-label">🏥 ICU</span><span class="duty-name">หมอครีม</span></div><div class="duty-row"><span class="duty-label">📞 Consult</span><span class="duty-name">หมอวี</span></div></div>`,true);}
+    else if(q.includes('สัปดาห์')){let r='📋 สัปดาห์นี้\n<div class="duty-card">';for(let i=0;i<7;i++){const d=new Date();d.setDate(d.getDate()-d.getDay()+1+i);r+=`<div class="duty-row"><span class="duty-label">${days[d.getDay()]} ${d.getDate()}/${d.getMonth()+1}</span><span class="duty-name">ICU:หมอครีม | C:${dp[i%5]}</span></div>`;}r+='</div>';addBot(r,true);}
+    else if(q.includes('icu'))addBot(`🏥 ICU เดือน ${new Date().getMonth()+1}/${new Date().getFullYear()}: <b>หมอครีม</b>`,true);
+    else if(q.includes('แลก'))addBot('🔄 กดปุ่ม <b>🔄 แลกเวร</b> ด้านล่างเพื่อเริ่มแลกเวรค่ะ',true);
+    else addBot('ลองถามใหม่ค่ะ เช่น "ใครเวรวันนี้" หรือกดปุ่มด้านล่าง');
+    userInput.focus();
+  };
 }
 </script>
 </body>

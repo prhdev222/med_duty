@@ -21,9 +21,8 @@ git init
 # เพิ่ม remote (แทน YOUR_USERNAME และ YOUR_REPO ด้วยของจริง)
 git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPO.git
 
-# add และ commit
-git add duty.html server.js package.json vercel.json api/ .env.example .gitignore
-git add code.gs
+# add และ commit (ไม่มี code.gs — เก็บใน .gitignore)
+git add duty.html server.js package.json vercel.json .env.example .gitignore scripts/ DEPLOY.md APPS_SCRIPT_DEPLOY.md
 git commit -m "Add duty roster app + Vercel config"
 
 # push (สาขา main หรือ master)
@@ -53,7 +52,7 @@ git push -u origin main
 
 1. เปิด **Project** → แท็บ **Settings** → **Environment Variables**
 2. เพิ่มตัวแปร:
-   - **Name:** `APPS_SCRIPT_WEB_APP_URL`
+   - **Name:** `APPS_SCRIPT_URL`
    - **Value:** ใส่ URL ของ Google Apps Script Web App (ค่าเดียวกับใน .env)
 3. กด **Save**
 4. ไปที่ **Deployments** → กด **⋯** ที่ deployment ล่าสุด → **Redeploy** เพื่อให้ใช้ค่า env ใหม่
@@ -72,6 +71,6 @@ git push -u origin main
 |--------|--------|
 | GitHub | สร้าง repo แล้ว push โค้ด (ไม่มี .env) |
 | Vercel | Import repo → Deploy |
-| Vercel Env | ตั้งค่า `APPS_SCRIPT_WEB_APP_URL` แล้ว Redeploy |
+| Vercel Env | ตั้งค่า `APPS_SCRIPT_URL` แล้ว Redeploy |
 
 แก้โค้ดแล้ว push ขึ้น GitHub ใหม่ Vercel จะ deploy ใหม่ให้อัตโนมัติ (ถ้าเชื่อม GitHub ไว้)
