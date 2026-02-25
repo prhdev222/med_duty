@@ -119,11 +119,14 @@
   .typing span:nth-child(2){animation-delay:.2s}.typing span:nth-child(3){animation-delay:.4s}
   @keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
 
-  .quick-actions{padding:6px 20px;display:flex;gap:7px;flex-wrap:wrap;flex-shrink:0}
+  .quick-actions{padding:6px 20px 0;display:flex;gap:7px;flex-wrap:wrap;flex-shrink:0}
+  .quick-actions-row{padding:6px 20px 8px;display:flex;gap:7px;flex-wrap:wrap;flex-shrink:0}
   .qb{padding:7px 13px;background:var(--bg3);border:1px solid var(--border);border-radius:18px;color:var(--text2);font-size:12px;font-family:var(--font);cursor:pointer;transition:all .2s}
   .qb:hover{background:var(--glow);border-color:var(--accent);color:var(--accent)}
   .qb.swap-btn{border-color:rgba(251,191,36,0.3);color:var(--yellow)}
   .qb.swap-btn:hover{background:rgba(251,191,36,0.1);border-color:var(--yellow)}
+  .qb-main{background:var(--bg2);border-color:var(--border);font-weight:500}
+  .qb-main.active{background:rgba(96,165,250,0.15);border-color:var(--accent);color:var(--accent)}
 
   .input-area{padding:14px 20px 18px;background:var(--bg2);border-top:1px solid var(--border);flex-shrink:0}
   .input-wrap{display:flex;gap:8px;align-items:center;background:var(--bgi);border:1px solid var(--border);border-radius:12px;padding:5px 5px 5px 16px;transition:border-color .2s}
@@ -185,8 +188,8 @@
 <div class="header">
   <div class="header-icon">📋</div>
   <div class="header-text">
-    <h1>ระบบถามเวร</h1>
-    <p>ถามเวร Consult/ICU ของแพทย์อายุรกรรมได้เลย ไม่ต้อง login<br>แต่บันทึกแลกเวร ต้องมีรหัสเข้าใช้ระบบ</p>
+    <h1>ระบบถามรายชื่อแพทย์ตรวจ OPD / เวร Consult / ตรวจ ICU</h1>
+    <p>ถามเวร Consult/ICU หรือ OPD ของแพทย์อายุรกรรมได้เลย ไม่ต้อง login<br>แต่บันทึกแลกเวรหรือแลกวัน OPD ต้องมีรหัสเข้าใช้ระบบ</p>
   </div>
   <div class="header-user" id="headerUser">
     <span class="dot"></span>
@@ -199,19 +202,45 @@
 <div class="chat-area" id="chatArea">
   <div class="welcome">
     <div class="welcome-icon">🩺</div>
-    <h2>สวัสดีค่ะ! ถามเรื่องเวรได้เลย</h2>
-    <p>ถามเวร Consult/ICU ของแพทย์อายุรกรรมได้เลย ไม่ต้อง login<br>แต่ถ้าจะบันทึก <b>แลกเวร</b> ต้องมีรหัสเข้าใช้ระบบ</p>
+    <h2>สวัสดีค่ะ! ถามได้เลยค่ะ</h2>
+    <p>ตารางนี้เป็นตารางประจำของแพทย์อายุรกรรม (OPD / Consult / ICU)<br>ถ้าต้องการเช็กการแลกเวรหรืองดตรวจ ให้ดูเมนูดูแลกเวร/แลก OPD หรือโทรสอบถามค่ะ</p>
   </div>
 </div>
 
-<!-- QUICK ACTIONS -->
+<!-- QUICK ACTIONS: แถวหลักเลือกหมวด -->
 <div class="quick-actions">
+  <button class="qb qb-main" id="qaBtnDuty" onclick="toggleQuickGroup('duty')">🩺 เวร ICU/Consult</button>
+  <button class="qb qb-main" id="qaBtnOPD" onclick="toggleQuickGroup('opd')">🩺 วันออก OPD</button>
+  <button class="qb qb-main" id="qaBtnSwap" onclick="toggleQuickGroup('swap')">🔄 แลกเวร / แลก OPD</button>
+</div>
+
+<!-- QUICK ACTIONS: กลุ่มย่อย -->
+<div class="quick-actions-row" id="qaDuty" style="display:none">
   <button class="qb" onclick="ask('ใครเวรวันนี้')">📅 เวรวันนี้</button>
-  <button class="qb" onclick="ask('ใครเวรพรุ่งนี้')">🔜 พรุ่งนี้</button>
-  <button class="qb" onclick="ask('ตารางเวรสัปดาห์นี้')">🗓️ สัปดาห์</button>
-  <button class="qb" onclick="ask('เวร ICU เดือนนี้')">🏥 ICU</button>
-  <button class="qb swap-btn" onclick="onSwapClick()">🔄 แลกเวร</button>
+  <button class="qb" onclick="ask('ใครเวรพรุ่งนี้')">🔜 เวรพรุ่งนี้</button>
+  <button class="qb" onclick="ask('ตารางเวรสัปดาห์นี้')">🗓️ เวรสัปดาห์นี้</button>
+  <button class="qb" onclick="ask('เวร ICU เดือนนี้')">🏥 ICU เดือนนี้</button>
+  <button class="qb" onclick="ask('เวร ICU วันนี้')">🏥 ICU วันนี้</button>
+  <button class="qb" onclick="ask('เวร Consult วันนี้')">📞 Consult วันนี้</button>
+  <button class="qb" onclick="ask('เวร ICU พรุ่งนี้')">🏥 ICU พรุ่งนี้</button>
+  <button class="qb" onclick="ask('เวร Consult พรุ่งนี้')">📞 Consult พรุ่งนี้</button>
+  <button class="qb" onclick="showNameQueryHelp()">👤 เวรของ + ชื่อหมอ</button>
+</div>
+
+<div class="quick-actions-row" id="qaOPD" style="display:none">
+  <button class="qb" onclick="ask('วันออก OPD วันนี้')">🩺 OPD วันนี้</button>
+  <button class="qb" onclick="ask('วันออก OPD พรุ่งนี้')">🩺 OPD พรุ่งนี้</button>
+  <button class="qb" onclick="ask('วันออก OPD 23/3/2026')">🗓️ ตัวอย่าง: OPD 23/3/2026</button>
+  <button class="qb" onclick="showOPDSpecialtyHelp()">🔍 ค้นตามความเชี่ยวชาญ</button>
+</div>
+
+<div class="quick-actions-row" id="qaSwap" style="display:none">
+  <button class="qb swap-btn" onclick="onSwapClick()">🔄 แลกเวร ICU/Consult</button>
   <button class="qb" onclick="ask('มีแลกเวรอะไรบ้าง')">📝 ดูแลกเวร</button>
+  <button class="qb swap-btn" onclick="onOPDSwapClick()">🔄 แลกวัน OPD</button>
+  <button class="qb" onclick="ask('ประวัติแลก OPD วันนี้')">📝 ดูแลก OPD วันนี้</button>
+  <button class="qb" onclick="ask('ประวัติแลก OPD พรุ่งนี้')">📝 ดูแลก OPD พรุ่งนี้</button>
+  <button class="qb" onclick="showSwapDateHelp()">🗓️ ถามตามวันที่ยังไง?</button>
 </div>
 
 <!-- INPUT -->
@@ -230,8 +259,10 @@ const chatArea = document.getElementById('chatArea');
 const userInput = document.getElementById('userInput');
 
 let currentUser = null;  // null = ยังไม่ login
-let wizard = null;       // swap wizard state
+let wizard = null;       // swap wizard state (duty หรือ opd ตาม mode)
 let datePickCb = null;   // callback หลังเลือกวันจาก calendar
+let pendingSwapMode = 'duty';  // 'duty' | 'opd' หลัง login ว่าจะเริ่ม wizard ไหน
+let activeQuickGroup = null;   // 'duty' | 'opd' | 'swap'
 
 // =============================================
 // 💬 Chat helpers
@@ -279,6 +310,64 @@ function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g
 function dis(m){m.querySelectorAll('button').forEach(b=>b.disabled=true)}
 function wait(ms){return new Promise(r=>setTimeout(r,ms))}
 function fmtISO(d){return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
+
+// อธิบายวิธีถาม "แลกเวร / แลก OPD" แบบระบุวันที่
+function showSwapDateHelp(){
+  addBot(
+    'ตัวอย่างการถามโดยระบุวันที่:\n' +
+    '• ประวัติแลก OPD 3/3/2026\n' +
+    '• แลก OPD 2026-03-23\n\n' +
+    'รูปแบบวันที่ที่รองรับ:\n' +
+    '- วัน/เดือน/ปี (ค.ศ.) เช่น 3/3/2026\n' +
+    '- ปี-เดือน-วัน (ค.ศ.) เช่น 2026-03-03',
+    true
+  );
+}
+
+// อธิบายการค้น OPD ตามความเชี่ยวชาญ
+function showOPDSpecialtyHelp(){
+  addBot(
+    'ค้นวันออก OPD ตามความเชี่ยวชาญได้ เช่น:\n' +
+    '• OPD ความเชี่ยวชาญ สมอง วันนี้\n' +
+    '• OPD ความเชี่ยวชาญ หัวใจ 23/3/2026\n' +
+    '• OPD ความเชี่ยวชาญ สมอง สัปดาห์นี้\n\n' +
+    'ระบบจะดึงรายการ OPD แล้วกรองเฉพาะความเชี่ยวชาญที่มีคำนี้อยู่ เช่น\n' +
+    'คำว่า "สมอง" จะเจอแถวที่ความเชี่ยวชาญเป็น "ระบบประสาทและสมอง" เป็นต้น\n' +
+    'กรณีใส่คำว่า "สัปดาห์นี้" จะดูตั้งแต่วันจันทร์ถึงศุกร์ของสัปดาห์นี้ค่ะ',
+    true
+  );
+}
+
+// อธิบายว่าพิมพ์ "เวรของ + ชื่อหมอ" ได้
+function showNameQueryHelp(){
+  addBot(
+    'คุณสามารถพิมพ์ถามเป็นชื่อหมอได้ เช่น:\n' +
+    '- เวรของหมอสุพจน์\n' +
+    '- หมอณัฐพรเวรวันไหน\n' +
+    'ระบบจะสรุปให้ว่าเดือนนี้อยู่ ICU ไหม และ Consult ประจำวันไหนบ้างค่ะ',
+    true
+  );
+}
+
+// แสดง / ซ่อนกลุ่มปุ่มคำถามด่วน
+function toggleQuickGroup(group){
+  const groups=['duty','opd','swap'];
+  const btnMap={duty:'qaBtnDuty',opd:'qaBtnOPD',swap:'qaBtnSwap'};
+  const rowMap={duty:'qaDuty',opd:'qaOPD',swap:'qaSwap'};
+  if(activeQuickGroup===group){
+    // ถ้ากดซ้ำ กลุ่มเดิม → ซ่อน
+    document.getElementById(rowMap[group]).style.display='none';
+    document.getElementById(btnMap[group]).classList.remove('active');
+    activeQuickGroup=null;
+    return;
+  }
+  groups.forEach(g=>{
+    document.getElementById(rowMap[g]).style.display=(g===group)?'flex':'none';
+    const btn=document.getElementById(btnMap[g]);
+    if(btn) btn.classList.toggle('active',g===group);
+  });
+  activeQuickGroup=group;
+}
 // แปลงวันที่แบบไทย (วัน/เดือน/ปี พ.ศ.) → YYYY-MM-DD (ค.ศ.)
 function parseThaiDateToISO(s){
   s = s.trim();
@@ -327,9 +416,13 @@ async function doLogin() {
       closeLogin();
       document.getElementById('headerUser').classList.add('show');
       document.getElementById('displayName').textContent = currentUser.name;
-      addBot(`🔓 เข้าสู่ระบบสำเร็จ — ${currentUser.name}\nเริ่มกระบวนการแลกเวรค่ะ`);
+      const isOPD = pendingSwapMode === 'opd';
+      addBot(isOPD ? `🔓 เข้าสู่ระบบสำเร็จ — ${currentUser.name}\nเริ่มกระบวนการแลกวัน OPD ค่ะ` : `🔓 เข้าสู่ระบบสำเร็จ — ${currentUser.name}\nเริ่มกระบวนการแลกเวรค่ะ`);
+      if (isOPD && data.role === 'admin') {
+        addBot('สำหรับ Admin: ถ้าวันนั้นงดตรวจและไม่มีแพทย์แทน ให้เลือกแพทย์เดิมตามตาราง แล้วในขั้นเหตุผลพิมพ์ว่า "งดตรวจ ไม่มีแพทย์แทน" หรือข้อความที่เหมาะสม ระบบจะแสดงว่าเป็นงดตรวจในวันนั้นโดยไม่ต้องแก้ตารางหลักค่ะ');
+      }
       await wait(400);
-      startSwapWizard();
+      if (isOPD) startOPDSwapWizard(); else startSwapWizard();
     } else {
       err.textContent = '❌ ชื่อหรือ PIN ไม่ถูกต้อง';
     }
@@ -349,12 +442,33 @@ function doLogout() {
 // 🔄 กดแลกเวร → เช็ค login ก่อน
 // =============================================
 function onSwapClick() {
+  wizard = null;
+  pendingSwapMode = 'duty';
   if (currentUser) {
-    // ล็อกอินแล้ว → เริ่ม wizard เลย
     startSwapWizard();
   } else {
-    // ยังไม่ได้ล็อกอิน → ขึ้น popup
     addBot('🔐 ต้องยืนยันตัวตนก่อนแลกเวรค่ะ');
+    showLogin();
+  }
+}
+
+// =============================================
+// 🩺 วันออก OPD (ถามโดยไม่ต้อง login)
+// =============================================
+function askOPDToday() {
+  ask('วันออก OPD วันนี้');
+}
+
+// =============================================
+// 🔄 กดแลกวัน OPD → เช็ค login ก่อน
+// =============================================
+function onOPDSwapClick() {
+  wizard = null;
+  pendingSwapMode = 'opd';
+  if (currentUser) {
+    startOPDSwapWizard();
+  } else {
+    addBot('🔐 ต้องยืนยันตัวตนก่อนแลกวัน OPD ค่ะ');
     showLogin();
   }
 }
@@ -528,6 +642,144 @@ async function doConfirmSwap() {
 }
 
 // =============================================
+// 🔄 OPD SWAP WIZARD (แลกวัน OPD — ใช้ไฟล์ OPD_Mx)
+// =============================================
+async function startOPDSwapWizard() {
+  wizard = { isOPD: true };
+  addBot('🔄 เริ่มกระบวนการแลกวัน OPD');
+  await wait(400);
+  const days = ['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
+  const opts = [];
+  for (let i = 0; i <= 13; i++) {
+    const d = new Date(); d.setDate(d.getDate() + i);
+    const lbl = i === 0 ? 'วันนี้' : i === 1 ? 'พรุ่งนี้' : days[d.getDay()];
+    opts.push({ label: lbl + ' ' + d.getDate() + '/' + (d.getMonth()+1), value: fmtISO(d) });
+  }
+  opts.unshift({ label: '📅 เลือกวันอื่น...', value: '__calendar__' });
+  addBotOpts('ขั้นที่ 1/5 — เลือกวันที่ที่ต้องการแลก OPD:', opts.slice(0, 8), v=>{
+    if (v === '__calendar__') {
+      datePickCb = function(dateStr) { wizard.date = dateStr; opdStep3(); };
+      const input = document.getElementById('customDate');
+      const inputTh = document.getElementById('customDateThai');
+      if (input) { input.value = ''; input.min = fmtISO(new Date()); }
+      if (inputTh) inputTh.value = '';
+      document.getElementById('dateError').textContent = '';
+      document.getElementById('dateModal').classList.add('show');
+    } else {
+      wizard.date = v;
+      opdStep3();
+    }
+  });
+}
+
+async function opdStep3() {
+  showTyp();
+  try {
+    const res = await fetch(APPS_SCRIPT_URL, {
+      method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: 'get_opd_for_date', date: wizard.date })
+    });
+    const data = await res.json();
+    rmTyp();
+    if (!data.success) {
+      addBot('⚠️ ' + (data.error || 'ดึงข้อมูล OPD ไม่ได้'));
+      wizard = null;
+      return;
+    }
+    if (!data.slots || data.slots.length === 0) {
+      addBot('วันนี้ไม่มีตาราง OPD ในระบบค่ะ');
+      wizard = null;
+      return;
+    }
+    const dd = new Date(wizard.date);
+    const days = ['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
+    const opts = data.slots.map(s => ({
+      label: '👨‍⚕️ ' + (s.displayName || s.doctor) + (s.time ? ' ' + s.time : '') + (s.room ? ' ห้อง' + s.room : ''),
+      value: s.doctor
+    }));
+    addBot('ขั้นที่ 2/5 — วัน' + days[dd.getDay()] + 'ที่ ' + dd.getDate() + '/' + (dd.getMonth()+1) + '\n\nเลือกช่องที่ต้องการแลก:', true);
+    await wait(300);
+    addBotOpts('', opts, v=>{
+      wizard.originalDoctor = v;
+      wizard.allPeople = data.allPeople || [];
+      opdStep3b();
+    });
+  } catch(e) {
+    rmTyp();
+    addBot('⚠️ เชื่อมต่อไม่ได้');
+    wizard = null;
+  }
+}
+
+function opdStep3b() {
+  const people = (wizard.allPeople || []).filter(n => n !== wizard.originalDoctor);
+  const opts = people.map(n => ({ label: '👨‍⚕️ ' + n, value: n }));
+  // เพิ่มตัวเลือก "งดตรวจ (ไม่มีแพทย์แทน)" สำหรับกรณี cancel clinic
+  opts.push({ label: '⛔ งดตรวจ (ไม่มีแพทย์แทน)', value: 'งดตรวจ (ไม่มีแพทย์แทน)' });
+  if (opts.length === 0) {
+    addBot('⚠️ ไม่มีรายชื่อแพทย์แทนในระบบ');
+    wizard = null;
+    return;
+  }
+  addBotOpts('ขั้นที่ 3/5 — เลือกแพทย์ที่จะมาแทน:', opts, v=>{
+    wizard.replacement = v;
+    opdStep4();
+  });
+}
+
+async function opdStep4() {
+  await wait(400);
+  addBotOpts('ขั้นที่ 4/5 — เหตุผล:', [
+    { label: '📅 ติดประชุม', value: 'ติดประชุม' },
+    { label: '🤒 ลาป่วย', value: 'ลาป่วย' },
+    { label: '✈️ ลาพักร้อน', value: 'ลาพักร้อน' },
+    { label: '🔄 สลับวัน', value: 'สลับวัน' },
+    { label: '📝 อื่นๆ (พิมพ์)', value: '__custom__' }
+  ], v=>{
+    if (v === '__custom__') { addBot('กรุณาพิมพ์เหตุผล:'); wizard.waitReason = true; }
+    else { wizard.reason = v; opdStep5(); }
+  });
+}
+
+async function opdStep5() {
+  await wait(400);
+  const dd = new Date(wizard.date);
+  const days = ['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
+  const summary = 'ขั้นที่ 5/5 — ตรวจสอบข้อมูล\n\n' +
+    '<div class="duty-card">' +
+    '<div class="duty-row"><span class="duty-label">📅 วันที่</span><span class="duty-name">' + dd.getDate() + '/' + (dd.getMonth()+1) + ' (' + days[dd.getDay()] + ')</span></div>' +
+    '<div class="duty-row"><span class="duty-label">👤 แพทย์เดิม (OPD)</span><span class="duty-name">' + wizard.originalDoctor + '</span></div>' +
+    '<div class="duty-row"><span class="duty-label">🔄 แทนโดย</span><span class="duty-name">' + wizard.replacement + '</span></div>' +
+    '<div class="duty-row"><span class="duty-label">💬 เหตุผล</span><span class="duty-name">' + wizard.reason + '</span></div>' +
+    '<div class="duty-row"><span class="duty-label">📝 บันทึกโดย</span><span class="duty-name">' + currentUser.name + '</span></div>' +
+    '</div>';
+  addBotConfirm(summary, doConfirmOPDSwap, ()=>{ addBot('❌ ยกเลิกแล้วค่ะ'); wizard = null; });
+}
+
+async function doConfirmOPDSwap() {
+  showTyp();
+  try {
+    const res = await fetch(APPS_SCRIPT_URL, {
+      method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({
+        action: 'confirm_opd_swap',
+        swapData: {
+          date: wizard.date,
+          original: wizard.originalDoctor,
+          replacement: wizard.replacement,
+          reason: wizard.reason,
+          recordedBy: currentUser.name
+        }
+      })
+    });
+    const data = await res.json();
+    rmTyp();
+    addBot(data.success ? data.answer : '⚠️ ' + (data.error || ''), true);
+  } catch(e) { rmTyp(); addBot('⚠️ เชื่อมต่อไม่ได้'); }
+  wizard = null;
+}
+
+// =============================================
 // 📨 SEND MESSAGE (ถามเวร = ไม่ต้อง login)
 // =============================================
 function ask(t){ userInput.value=t; sendMsg(); }
@@ -537,8 +789,8 @@ async function sendMsg() {
   if(!t) return;
   addUser(t); userInput.value='';
 
-  // wizard waiting reason
-  if(wizard?.waitReason){wizard.reason=t;wizard.waitReason=false;step5();return;}
+  // wizard waiting reason (แลกเวร หรือ แลกวัน OPD)
+  if(wizard?.waitReason){wizard.reason=t;wizard.waitReason=false;if(wizard.isOPD)opdStep5();else step5();return;}
 
   document.getElementById('sendBtn').disabled=true;
   showTyp();
@@ -569,6 +821,13 @@ async function loadPeople() {
     if(data.success && data.people) {
       const sel=document.getElementById('loginName');
       data.people.forEach(n=>{const o=document.createElement('option');o.value=n;o.textContent=n;sel.appendChild(o);});
+      // เพิ่ม admin ใน dropdown ถ้ายังไม่มี (สำหรับสิทธิ์ admin ที่อยู่ในชีตผู้ใช้งาน)
+      if (![...sel.options].some(o => o.value === 'admin')) {
+        const o=document.createElement('option');
+        o.value='admin';
+        o.textContent='Admin';
+        sel.appendChild(o);
+      }
     }
   } catch(e){}
 }
@@ -635,8 +894,9 @@ if(!APPS_SCRIPT_URL||APPS_SCRIPT_URL==='__APPS_SCRIPT_URL__'||APPS_SCRIPT_URL===
 }
 </script>
 
-<div style="text-align:center;font-size:11px;color:#64748b;padding:10px 0 14px;">
-  © 2026 directed by Uradev
+<div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#64748b;padding:10px 20px 14px;">
+  <span>สร้างด้วยใจ เพื่อแผนกอายุรกรรม</span>
+  <span>© 2026 directed by Uradev</span>
 </div>
 </body>
 </html>
