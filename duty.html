@@ -188,8 +188,8 @@
 <div class="header">
   <div class="header-icon">📋</div>
   <div class="header-text">
-    <h1>ระบบถามรายชื่อแพทย์ตรวจ OPD / เวร Consult / ตรวจ ICU</h1>
-    <p>ถามเวร Consult/ICU หรือ OPD ของแพทย์อายุรกรรมได้เลย ไม่ต้อง login<br>แต่บันทึกแลกเวรหรือแลกวัน OPD ต้องมีรหัสเข้าใช้ระบบ</p>
+    <h1 style="cursor:pointer" onclick="toggleInfoPanel()">ระบบถามรายชื่อแพทย์ตรวจ OPD / เวร Consult / ตรวจ ICU</h1>
+    <p style="font-size:10px;color:var(--text3);cursor:pointer" onclick="toggleInfoPanel()">คลิกหัวข้อนี้เพื่อดูคำอธิบายเพิ่มเติม</p>
   </div>
   <div class="header-user" id="headerUser">
     <span class="dot"></span>
@@ -198,12 +198,20 @@
   </div>
 </div>
 
+<!-- INFO PANEL (ซ่อน/แสดงเมื่อคลิกหัวข้อด้านบน) -->
+<div id="infoPanel" style="display:none;padding:10px 20px 0;font-size:11px;color:var(--text2);">
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:8px 12px;line-height:1.6;">
+    <div><b>ℹ️ คำอธิบายระบบ</b></div>
+    <div>ถามเวร Consult/ICU หรือ OPD ของแพทย์อายุรกรรมได้เลย ไม่ต้อง login แต่บันทึกแลกเวรหรือแลกวัน OPD ต้องมีรหัสเข้าใช้ระบบ</div>
+    <div style="margin-top:4px;">ตารางแสดงเป็นตารางประจำของแพทย์อายุรกรรม (OPD / Consult / ICU) ถ้าต้องการเช็กการแลกเวรหรืองดตรวจ ให้ดูเมนูดูแลกเวร/แลก OPD หรือโทรสอบถามค่ะ</div>
+  </div>
+</div>
+
 <!-- CHAT -->
 <div class="chat-area" id="chatArea">
   <div class="welcome">
     <div class="welcome-icon">🩺</div>
     <h2>สวัสดีค่ะ! ถามได้เลยค่ะ</h2>
-    <p>ตารางนี้เป็นตารางประจำของแพทย์อายุรกรรม (OPD / Consult / ICU)<br>ถ้าต้องการเช็กการแลกเวรหรืองดตรวจ ให้ดูเมนูดูแลกเวร/แลก OPD หรือโทรสอบถามค่ะ</p>
   </div>
 </div>
 
@@ -310,6 +318,13 @@ function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g
 function dis(m){m.querySelectorAll('button').forEach(b=>b.disabled=true)}
 function wait(ms){return new Promise(r=>setTimeout(r,ms))}
 function fmtISO(d){return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
+
+// แสดง/ซ่อนแผงคำอธิบายด้านบน
+function toggleInfoPanel(){
+  const panel = document.getElementById('infoPanel');
+  if(!panel) return;
+  panel.style.display = (panel.style.display === 'none' || panel.style.display === '') ? 'block' : 'none';
+}
 
 // อธิบายวิธีถาม "แลกเวร / แลก OPD" แบบระบุวันที่
 function showSwapDateHelp(){
