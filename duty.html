@@ -249,7 +249,7 @@
   <button class="qb swap-btn" onclick="onOPDSwapClick()">🔄 แลกวัน OPD</button>
   <button class="qb" onclick="ask('ประวัติแลก OPD วันนี้')">📝 ดูแลก OPD วันนี้</button>
   <button class="qb" onclick="ask('ประวัติแลก OPD พรุ่งนี้')">📝 ดูแลก OPD พรุ่งนี้</button>
-  <button class="qb" onclick="showSwapDateHelp()">🗓️ ถามตามวันที่ยังไง?</button>
+  <button class="qb" onclick="openOPDSwapDatePicker()">🗓️ ดูแลก OPD เลือกวันที่</button>
 </div>
 
 <!-- INPUT -->
@@ -338,6 +338,19 @@ function showSwapDateHelp(){
     '- ปี-เดือน-วัน (ค.ศ.) เช่น 2026-03-03',
     true
   );
+}
+
+function openOPDSwapDatePicker(){
+  datePickCb = function(dateStr) {
+    ask('ประวัติแลก OPD ' + dateStr);
+  };
+  const input = document.getElementById('customDate');
+  const inputTh = document.getElementById('customDateThai');
+  input.value = '';
+  input.min = '';
+  inputTh.value = '';
+  document.getElementById('dateError').textContent = '';
+  document.getElementById('dateModal').classList.add('show');
 }
 
 function openOPDDatePicker(){
