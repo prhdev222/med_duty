@@ -26,6 +26,8 @@ const http = require('http');
 
 const PORT = process.env.PORT || 3780;
 
+const MIME = { '.png':'image/png', '.jpg':'image/jpeg', '.jpeg':'image/jpeg', '.gif':'image/gif', '.svg':'image/svg+xml', '.ico':'image/x-icon', '.webp':'image/webp' };
+
 const server = http.createServer((req, res) => {
   if (req.url === '/' || req.url === '/duty.html') {
     const filePath = path.join(__dirname, 'duty.html');
@@ -35,7 +37,6 @@ const server = http.createServer((req, res) => {
         res.end('ไม่พบไฟล์ duty.html');
         return;
       }
-      // ใส่ URL จาก .env ลงใน HTML (แทนที่ placeholder)
       const url = ENV_URL || '__APPS_SCRIPT_URL__';
       const placeholder = /const\s+APPS_SCRIPT_URL\s*=\s*['"]__APPS_SCRIPT_URL__['"]\s*;/;
       const injected = html.replace(placeholder, 'const APPS_SCRIPT_URL = ' + JSON.stringify(url) + ';');
@@ -44,6 +45,19 @@ const server = http.createServer((req, res) => {
     });
     return;
   }
+
+  if (req.url.startsWith('/images/')) {
+    const filePath = path.join(__dirname, req.url);
+    const ext = path.extname(filePath).toLowerCase();
+    const mime = MIME[ext] || 'application/octet-stream';
+    fs.readFile(filePath, (err, data) => {
+      if (err) { res.writeHead(404); res.end(); return; }
+      res.writeHead(200, { 'Content-Type': mime });
+      res.end(data);
+    });
+    return;
+  }
+
   res.writeHead(404);
   res.end();
 });

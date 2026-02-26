@@ -21,3 +21,13 @@ html = html.replace(
 );
 fs.writeFileSync(dest, html, 'utf8');
 console.log('Wrote out/index.html with APPS_SCRIPT_URL from env');
+
+const imgSrc = path.join(root, 'images');
+const imgDest = path.join(outDir, 'images');
+if (fs.existsSync(imgSrc)) {
+  if (!fs.existsSync(imgDest)) fs.mkdirSync(imgDest, { recursive: true });
+  fs.readdirSync(imgSrc).forEach(f => {
+    fs.copyFileSync(path.join(imgSrc, f), path.join(imgDest, f));
+  });
+  console.log('Copied images/ to out/images/');
+}
