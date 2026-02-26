@@ -254,6 +254,11 @@
   </div>
 </div>
 
+<!-- QUICK ACTIONS TOGGLE -->
+<div style="padding:4px 20px 0;display:flex;justify-content:center">
+  <button class="qb" id="qaToggleBtn" onclick="toggleAllQuickActions()" style="font-size:12px;padding:5px 16px;opacity:0.7">▼ เมนูคำถาม</button>
+</div>
+<div id="qaWrapper">
 <!-- QUICK ACTIONS: แถวหลักเลือกหมวด -->
 <div class="quick-actions">
   <button class="qb qb-main" id="qaBtnDuty" onclick="toggleQuickGroup('duty')">🩺 เวร ICU/Consult</button>
@@ -290,6 +295,7 @@
   <button class="qb" onclick="ask('ประวัติแลก OPD พรุ่งนี้')">📝 ดูแลก OPD พรุ่งนี้</button>
   <button class="qb" onclick="openOPDSwapDatePicker()">🗓️ ดูแลก OPD เลือกวันที่</button>
 </div>
+</div><!-- /qaWrapper -->
 
 <!-- INPUT -->
 <div class="input-area">
@@ -430,7 +436,13 @@ function showNameQueryHelp(){
   );
 }
 
-// แสดง / ซ่อนกลุ่มปุ่มคำถามด่วน
+let qaVisible = true;
+function toggleAllQuickActions(){
+  qaVisible = !qaVisible;
+  document.getElementById('qaWrapper').style.display = qaVisible ? '' : 'none';
+  document.getElementById('qaToggleBtn').textContent = qaVisible ? '▲ ซ่อนเมนู' : '▼ เมนูคำถาม';
+}
+
 function toggleQuickGroup(group){
   const groups=['duty','opd','swap'];
   const btnMap={duty:'qaBtnDuty',opd:'qaBtnOPD',swap:'qaBtnSwap'};
