@@ -324,7 +324,7 @@ let activeQuickGroup = null;   // 'duty' | 'opd' | 'swap'
 function addBot(t, html=false) {
   rmWelcome();
   const m=el('div','message bot');
-  m.innerHTML=`<div class="av">🤖</div><div class="bd">${html?t:esc(t)}</div>`;
+  m.innerHTML=`<div class="av"><img src="images/ANT.png" alt="bot" style="width:100%;height:100%;border-radius:50%;object-fit:cover"></div><div class="bd">${html?t:esc(t)}</div>`;
   chatArea.appendChild(m); scroll();
 }
 function addBotOpts(t, opts, cb) {
@@ -333,7 +333,7 @@ function addBotOpts(t, opts, cb) {
   let h='<div class="bot-options">';
   opts.forEach((o,i)=>h+=`<button class="opt-btn" data-i="${i}">${esc(o.label)}</button>`);
   h+='</div>';
-  m.innerHTML=`<div class="av">🤖</div><div class="bd">${esc(t)}\n${h}</div>`;
+  m.innerHTML=`<div class="av"><img src="images/ANT.png" alt="bot" style="width:100%;height:100%;border-radius:50%;object-fit:cover"></div><div class="bd">${esc(t)}\n${h}</div>`;
   chatArea.appendChild(m); scroll();
   m.querySelectorAll('.opt-btn').forEach(b=>b.onclick=function(){
     m.querySelectorAll('.opt-btn').forEach(x=>x.disabled=true);
@@ -345,7 +345,7 @@ function addBotOpts(t, opts, cb) {
 function addBotConfirm(t, onOk, onNo) {
   rmWelcome();
   const m=el('div','message bot');
-  m.innerHTML=`<div class="av">🤖</div><div class="bd">${t}<div class="cfm-btns"><button class="btn-ok">✅ ยืนยันแลกเวร</button><button class="btn-no">❌ ยกเลิก</button></div></div>`;
+  m.innerHTML=`<div class="av"><img src="images/ANT.png" alt="bot" style="width:100%;height:100%;border-radius:50%;object-fit:cover"></div><div class="bd">${t}<div class="cfm-btns"><button class="btn-ok">✅ ยืนยันแลกเวร</button><button class="btn-no">❌ ยกเลิก</button></div></div>`;
   chatArea.appendChild(m); scroll();
   m.querySelector('.btn-ok').onclick=function(){dis(m);addUser('ยืนยัน');onOk()};
   m.querySelector('.btn-no').onclick=function(){dis(m);addUser('ยกเลิก');onNo()};
@@ -355,7 +355,7 @@ function addUser(t) {
   m.innerHTML=`<div class="av">👤</div><div class="bd">${esc(t)}</div>`;
   chatArea.appendChild(m); scroll();
 }
-function showTyp(){const m=el('div','message bot');m.id='typ';m.innerHTML=`<div class="av">🤖</div><div class="bd"><span class="typing"><span></span><span></span><span></span></span></div>`;chatArea.appendChild(m);scroll()}
+function showTyp(){const m=el('div','message bot');m.id='typ';m.innerHTML=`<div class="av"><img src="images/ANT.png" alt="bot" style="width:100%;height:100%;border-radius:50%;object-fit:cover"></div><div class="bd"><span class="typing"><span></span><span></span><span></span></span></div>`;chatArea.appendChild(m);scroll()}
 function rmTyp(){document.getElementById('typ')?.remove()}
 function rmWelcome(){chatArea.querySelector('.welcome')?.remove()}
 function scroll(){chatArea.scrollTop=chatArea.scrollHeight}
