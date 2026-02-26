@@ -238,8 +238,9 @@
 <div class="quick-actions-row" id="qaOPD" style="display:none">
   <button class="qb" onclick="ask('วันออก OPD วันนี้')">🩺 OPD วันนี้</button>
   <button class="qb" onclick="ask('วันออก OPD พรุ่งนี้')">🩺 OPD พรุ่งนี้</button>
-  <button class="qb" onclick="ask('วันออก OPD 23/3/2026')">🗓️ ตัวอย่าง: OPD 23/3/2026</button>
-  <button class="qb" onclick="showOPDSpecialtyHelp()">🔍 ค้นตามความเชี่ยวชาญ</button>
+  <button class="qb" onclick="openOPDDatePicker()">🗓️ OPD เลือกวันที่</button>
+  <button class="qb" onclick="prefillSpecialty()">🔍 ค้นตามความเชี่ยวชาญ</button>
+  <button class="qb" onclick="prefillSpecialtyWeek()">🔍 ค้นความเชี่ยวชาญ สัปดาห์นี้</button>
 </div>
 
 <div class="quick-actions-row" id="qaSwap" style="display:none">
@@ -339,21 +340,31 @@ function showSwapDateHelp(){
   );
 }
 
-// อธิบายการค้น OPD ตามความเชี่ยวชาญ
-function showOPDSpecialtyHelp(){
-  addBot(
-    'ค้นวันออก OPD ตามความเชี่ยวชาญได้ เช่น:\n' +
-    '• OPD ความเชี่ยวชาญ สมอง วันนี้\n' +
-    '• OPD ความเชี่ยวชาญ หัวใจ 23/3/2026\n' +
-    '• OPD ความเชี่ยวชาญ ปอด สัปดาห์นี้\n\n' +
-    '💡 ใช้คำสั้นๆ ได้เลย ระบบจะค้นคำพ้องให้อัตโนมัติ เช่น:\n' +
-    '• "ปอด" → จะค้นเจอ ทางเดินหายใจ, ปอด\n' +
-    '• "ไต" → จะค้นเจอ โรคไต, ทางเดินปัสสาวะ\n' +
-    '• "เบาหวาน" → จะค้นเจอ เบาหวาน, ไทรอยด์, ต่อมไร้ท่อ\n' +
-    '• "ตับ" / "กระเพาะ" → จะค้นเจอ ทางเดินอาหาร\n\n' +
-    'กรณีใส่คำว่า "สัปดาห์นี้" จะดูตั้งแต่วันจันทร์ถึงศุกร์ค่ะ',
-    true
-  );
+function openOPDDatePicker(){
+  datePickCb = function(dateStr) {
+    ask('วันออก OPD ' + dateStr);
+  };
+  const input = document.getElementById('customDate');
+  const inputTh = document.getElementById('customDateThai');
+  input.value = '';
+  input.min = '';
+  inputTh.value = '';
+  document.getElementById('dateError').textContent = '';
+  document.getElementById('dateModal').classList.add('show');
+}
+
+function prefillSpecialty(){
+  addBot('พิมพ์ความเชี่ยวชาญต่อท้ายแล้วกด Enter ได้เลยค่ะ เช่น ปอด, ไต, หัวใจ, สมอง, เบาหวาน');
+  userInput.value = 'OPD ความเชี่ยวชาญ ';
+  userInput.focus();
+}
+function prefillSpecialtyWeek(){
+  addBot('พิมพ์ความเชี่ยวชาญแล้วกด Enter ได้เลยค่ะ (ดูจันทร์-ศุกร์)');
+  var prefix = 'OPD ความเชี่ยวชาญ ';
+  var suffix = ' สัปดาห์นี้';
+  userInput.value = prefix + suffix;
+  userInput.focus();
+  userInput.setSelectionRange(prefix.length, prefix.length);
 }
 
 // อธิบายว่าพิมพ์ "เวรของ + ชื่อหมอ" ได้
