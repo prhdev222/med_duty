@@ -780,7 +780,11 @@ async function opdStep3() {
       return;
     }
     if (!data.slots || data.slots.length === 0) {
-      addBot('วันนี้ไม่มีตาราง OPD ในระบบค่ะ');
+      if (data.isWeekend) {
+        addBot('📅 วัน' + data.dayName + ' เป็นวันหยุด ไม่มี OPD ค่ะ\nแพทย์จะไม่ได้ลงตรวจในวันเสาร์-อาทิตย์');
+      } else {
+        addBot('วัน' + (data.dayName || '') + ' ไม่มีตาราง OPD ในระบบค่ะ');
+      }
       wizard = null;
       return;
     }
